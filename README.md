@@ -4,6 +4,90 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
+const PdfDocument = useMemo(() => {
+  const documentTitle = previewData?.template_for || previewData?.doc_category || previewData;
+  const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
+
+  return () => (
+    <Document title={documentTitle}>
+      
+      <Page
+        size="A4"
+        style={pdfStyles.page}
+        render={({ pageNumber, totalPages }) => (
+          <View style={{ flex: 1 }}>
+
+            {/* Watermark */}
+            {webSettingData?.water_mark_file && (
+              <View style={pdfStyles.watermarkContainer} fixed>
+                <Image
+                  style={pdfStyles.watermark}
+                  src={config.IMAGE_PATH + webSettingData.water_mark_file}
+                />
+              </View>
+            )}
+
+            {/* Header (always visible) */}
+            <View style={pdfStyles.header} fixed>
+              <View style={pdfStyles.headerLines} />
+              <View style={pdfStyles.branding}>
+                {webSettingData?.logo_image && (
+                  <Image
+                    style={pdfStyles.logo}
+                    src={config.IMAGE_PATH + webSettingData.logo_image}
+                  />
+                )}
+              </View>
+            </View>
+
+            {/* MAIN CONTENT */}
+            <View style={pdfStyles.content}>
+              {parsedPdfContent}
+            </View>
+
+            {/* FOOTER — only on FIRST + LAST page */}
+            {(pageNumber === 1 || pageNumber === totalPages) && (
+              <View style={pdfStyles.footer} fixed>
+                <Text style={pdfStyles.companyName}>
+                  {webSettingData?.meta_title}
+                </Text>
+
+                <Text style={pdfStyles.address}>
+                  {webSettingData?.office_address}
+                </Text>
+
+                <Text style={pdfStyles.contact}>
+                  Tel: {webSettingData?.organization_mobile_no}
+                  <Text style={pdfStyles.separator}> | </Text>
+                  Email: {webSettingData?.organization_email_id}
+                  <Text style={pdfStyles.separator}> | </Text>
+                  Website: {cleanWebsite}
+                </Text>
+
+                <View style={{ position: 'absolute', bottom: 1, right: 5 }}>
+                  <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                    {showSignature && (
+                      <Image
+                        style={{ width: 100, height: 60 }}
+                        src={config.IMAGE_PATH + webSettingData?.hod_hr_signature}
+                      />
+                    )}
+                  </View>
+                </View>
+
+                <View style={pdfStyles.footerLines} />
+              </View>
+            )}
+
+          </View>
+        )}
+      />
+
+    </Document>
+  );
+}, [parsedPdfContent, webSettingData, previewData, showSignature]);
+
+
 In the project directory, you can run:
 
 ### `npm start`

@@ -409,6 +409,7 @@ const OfferLatterTemp = ({ type, template, setTemplate, loadingTemplate, handleF
         { key: 'ro_address', label: 'RO Address' },
         { key: 'salary_structure', label: 'Salary Structure' },
         { key: 'additional_benefits', label: 'Additional Benefits' },
+        { key: 'signature', label: 'Signature' },
     ];
 
     const [deleteDocumentLoading, setDeleteModalLoading] = useState(false);
@@ -750,32 +751,32 @@ const OfferLatterTemp = ({ type, template, setTemplate, loadingTemplate, handleF
                                 <Form.Group className="mb-3">
                                     <Form.Label>Template Description</Form.Label>
                                     <Editor
-                                    onInit={(evt, editor) => {
-                                        editorRef.current = editor;
-                                    }}
-                                    value={formData.description}
-                                    onEditorChange={(content) => {
-                                        setFormDataWithPayloads((prev) => ({
-                                            ...prev,
-                                            description: content
-                                        }))
-                                    }}
-                                    tinymceScriptSrc={src}
-                                    init={{
-                                        height: 500,
-                                        menubar: true,
-                                        plugins: "advlist lists link image code table wordcount",
-                                        toolbar:
-                                            "undo redo | formatselect | bold italic underline | " +
-                                            "alignleft aligncenter alignright alignjustify | " +
-                                            "bullist numlist outdent indent | link image | table | removeformat | code" +
-                                            "lineheight | forecolor backcolor | fullscreen",
-                                        content_style:
-                                            "body { font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:1.5 }",
-                                        line_height_formats: "1 1.15 1.5 1.75 2 2.5 3",
-                                        branding: false,
-                                        promotion: false,
-                                    }}
+                                        onInit={(evt, editor) => {
+                                            editorRef.current = editor;
+                                        }}
+                                        value={formData.description}
+                                        onEditorChange={(content) => {
+                                            setFormDataWithPayloads((prev) => ({
+                                                ...prev,
+                                                description: content
+                                            }))
+                                        }}
+                                        tinymceScriptSrc={src}
+                                        init={{
+                                            height: 500,
+                                            menubar: true,
+                                            plugins: "advlist lists link image code table wordcount",
+                                            toolbar:
+                                                "undo redo | formatselect | bold italic underline | " +
+                                                "alignleft aligncenter alignright alignjustify | " +
+                                                "bullist numlist outdent indent | link image | table | removeformat | code" +
+                                                "lineheight | forecolor backcolor | fullscreen",
+                                            content_style:
+                                                "body { font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:1.5 }",
+                                            line_height_formats: "1 1.15 1.5 1.75 2 2.5 3",
+                                            branding: false,
+                                            promotion: false,
+                                        }}
                                     />
                                     <Form.Control.Feedback type="invalid">
                                         Please enter a description.

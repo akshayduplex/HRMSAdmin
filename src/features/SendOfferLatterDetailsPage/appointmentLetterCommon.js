@@ -165,7 +165,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     tableCell: {
       flex: 1,
       padding: '6pt 8pt',
-      fontSize:9,
+      fontSize: 9,
       borderRightWidth: 1,
       borderRightColor: '#d9dfe8',
       borderBottomWidth: 1,
@@ -379,6 +379,18 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
           }
         }
         case 'div': {
+          if (element.getAttribute('data-type') === 'signature-placeholder') {
+            if (webSettingData?.hod_hr_signature) {
+              return (
+                <Image
+                  key={index}
+                  style={{ width: 100, height: 60, marginTop: 10, marginBottom: 10 }}
+                  src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
+                />
+              );
+            }
+            return null;
+          }
           const divChildren = Array.from(element.children);
           if (divChildren.length > 0) {
             const parsedChildren = divChildren.map((child, childIdx) => parseElement(child, `${index}-${childIdx}`)).filter(Boolean);
@@ -415,7 +427,12 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     };
 
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = templateDescription;
+    // Pre-process functionality for signature
+    const processedDescription = templateDescription.replace(
+      /\{#signature\}/g,
+      '<div data-type="signature-placeholder"></div>'
+    );
+    tempDiv.innerHTML = processedDescription;
     const elements = Array.from(tempDiv.children);
 
     const validElements = elements.filter(el => {
@@ -431,18 +448,20 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     }
 
     return validElements.map((el, i) => parseElement(el, i)).filter(Boolean);
-  }, [templateDescription, parseInlineText, hasSkipClass]); // FIXED: Added dependencies
+  }, [templateDescription, parseInlineText, hasSkipClass, webSettingData, pdfStyles]); // FIXED: Added dependencies
 
-    let showSignature = useMemo(() => {
+  let showSignature = useMemo(() => {
     if (previewData?.template_for === "Appointment Letter") {
       return true
     }
     return false
   }, [previewData])
-  
+
   // FIX 4: Memoize PDF Document component
   const PdfDocument = useMemo(() => {
     const documentTitle = previewData?.template_for || previewData?.doc_category || previewData;
+
+    const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
     return () => (
       <Document title={documentTitle}>
         <Page size="A4" style={pdfStyles.page}>
@@ -472,40 +491,37 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
           <View style={pdfStyles.content}>
             {parsedPdfContent}
           </View>
-
           <View style={pdfStyles.footer} fixed>
-            <Text style={pdfStyles.companyName}>{webSettingData?.meta_title}</Text>
-            <Text style={pdfStyles.address}>{webSettingData?.office_address}</Text>
-            <Text style={pdfStyles.contact}>
-              Tel: {webSettingData?.organization_mobile_no} <Text style={pdfStyles.separator}>|</Text> Email: {webSettingData?.organization_email_id} <Text style={pdfStyles.separator}>|</Text> Website: {webSettingData?.website_link}
+            <Text style={pdfStyles.companyName}>
+              {webSettingData?.meta_title}
             </Text>
 
-            <View style={{ position: 'absolute', bottom: 1, right: 5, }}>
+            <Text style={pdfStyles.address}>
+              {webSettingData?.office_address}
+            </Text>
+
+            <Text style={pdfStyles.contact}>
+              Tel: {webSettingData?.organization_mobile_no}
+              <Text style={pdfStyles.separator}> | </Text>
+              Email: {webSettingData?.organization_email_id}
+              <Text style={pdfStyles.separator}> | </Text>
+              Website: {cleanWebsite}
+            </Text>
+
+            <View style={{ position: 'absolute', bottom: 1, right: 5 }}>
               <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                {/* <Text style={{ fontSize: 8, color: '#1d1e30', fontWeight: 'bold' }}>Authorized Signatory</Text>
-                <Text style={{ fontSize: 8, color: '#1d1e30' }}>
-                  {webSettingData?.authorized_person_name || 'Authorized Person'}
-                </Text>
-                <Text style={{ fontSize: 7, color: '#667085' }}>
-                  {webSettingData?.authorized_person_designation || 'HR Manager'}
-                </Text> */}
-                {
-                  showSignature && (
-                    <Image
-                      style={{ width: 100, height: 60 }}
-                      src={config.IMAGE_PATH + webSettingData?.hod_hr_signature}
-                    />
-                  )
-                }
+                {showSignature && (
+                  <Image
+                    style={{ width: 100, height: 60 }}
+                    src={config.IMAGE_PATH + webSettingData?.hod_hr_signature}
+                  />
+                )}
               </View>
             </View>
 
-
-
             <View style={pdfStyles.footerLines} />
-
-
           </View>
+
         </Page>
       </Document>
     );
