@@ -1,0 +1,31 @@
+.table-container {
+    border: 1px solid #6A5ACD;
+    border-radius: 15px;
+    padding: 0;
+    background-color: #fff;
+  }
+  
+  .table-container table thead.table-header th {
+    background-color: #4B0082 !important;
+    text-align: center;
+    font-weight: 400;
+    font-size: 15px;
+    min-width: 150px;
+    height: 50px;
+    line-height: 50px;
+    color: white; 
+  }
+  
+  
+  
+  .table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+
+
+
+.kpikratable td, .kpikratable td p, .kpikratable  li {
+  font-size: 13px;
+  color: #000;
+}

@@ -1,0 +1,170 @@
+.assts_btn {
+  background: transparent;
+  border: 0;
+  text-align: -webkit-center;
+  padding: 6px;
+  max-width: 110px;
+}
+
+.assts_btn svg {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 18px;
+}
+
+.asstbtn_wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+}
+
+.assets_imgwrap {
+  display: flex;
+  gap: 15px;
+}
+
+.assets_imgwrap img {
+  max-width: 100px;
+  margin-top: 20px;
+  border-radius: 10px;
+  height: 75px;
+}
+
+button.dlt_asstimg {
+  position: absolute;
+  background: #FF2200;
+  border: 0;
+  right: -8px;
+  top: 12px;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 0px 5px;
+  line-height: normal;
+}
+
+.asstupload input.cstmfile {
+  width: 100%;
+  border-color: #D2C9FF;
+}
+
+.btn-center { text-align: -webkit-center; }
+
+.textareaa {
+  height: auto;
+}
+
+
+
+
+.asst_dtlsbox p {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+  color: #000;
+}
+
+.asst_dtlsbox h6 {
+  color: #585858;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 150%; /* 27px */
+}
+
+.asst_dtlsbox {
+  margin-bottom: 22px;
+}
+
+.viewasst_imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.astimgbox {
+  padding: 5px;
+  position: relative;
+}
+
+.astimgbox svg {
+  background: green;
+  color: #fff;
+  width: 22px;
+  cursor: pointer;
+  height: 20px;
+  padding: 3px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.decltion {
+  display: flex;
+  gap: 12px;
+}
+
+.decltion svg {
+  width: 22px;
+  height: 20px;
+  padding: 3px;
+  background: #008000;
+  cursor: pointer;
+  color: #fff;
+}
+
+
+.assttblbtns {
+  gap: 15px;
+}
+
+.assttblbtns svg {
+  font-size: 16px;
+ 
+}
+
+.assttblbtns span {
+  display: block;
+  line-height: normal;
+  color: #000;
+}
+
+.assttblbtns div {
+  line-height: normal;
+  text-align: center;
+  padding-top: 5px;
+  cursor: pointer;
+}
+
+.inactive svg, .inactive span {
+  color: #AFAFAF;
+  cursor: auto;
+}
+
+.asst_status {
+  border-radius: 7px;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.bg_magenta {
+  background: #871F8E;
+}
+
+.astactive {
+  color: #CC8410;
+}
+
+.dltactive {
+  color: #FF2200;
+}
+
+button.bg_purplbtn {
+  background: #29166F;
+  color: #fff;
+  border: 0;
+  padding: 7px 20px;
+  border-radius: 5px;
+}

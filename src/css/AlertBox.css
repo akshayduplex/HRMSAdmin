@@ -1,0 +1,28 @@
+/* src/components/AlertBox.css */
+.alert-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+  }
+  
+  .alert-box.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .alert-box.error {
+    background-color: #ce6464;
+    color: #ffffff;
+  }
+  
+  .alert-box button {
+    margin-left: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  

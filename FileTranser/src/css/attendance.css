@@ -1,0 +1,648 @@
+.max-input .calendar {
+  right: 5px;
+  top: 5px;
+}
+.rmdp-container {
+  width: 100%;
+}
+.w-mlarge {
+  max-width: 500px;
+}
+.daterangepicker {
+  max-width: 380px;
+}
+.last-tr tr td:last-child {
+  width: 150px;
+}
+.modal-body tbody tr td {
+  padding: 18px 8px 18px 18px !important;
+  font-size: 16px;
+  color: #585858 !important;
+}
+.last-tr tr td {
+  background-color: #fff;
+}
+.leaves-app td {
+  background-color: #f7f5ff !important;
+}
+
+.line-right {
+  border-right: 1px solid gray;
+  width: 1px;
+  height: 20px;
+}
+
+.detailsbox {
+  border-radius: 5px;
+  border: 1px solid var(--Purple-Light, #d2c9ff);
+  background: var(--White, #fff);
+}
+.ps-text {
+  padding-left: 2rem;
+}
+.w-20 {
+  width: 140px;
+}
+
+.timetext1 {
+  left: 3px;
+  top: 5px;
+}
+
+.loggedcolor {
+  background-color: #ebebeb;
+  border-left: 2px solid #29166f;
+  padding: 5px 0 5px 5px;
+}
+
+.border-sec {
+  border: 1px solid #d2c9ff;
+}
+
+.max-input .calendar {
+  right: 5px;
+  top: 5px;
+}
+
+.full-calendar-width {
+  max-width: 250px;
+  width: 100%;
+}
+.border-purple {
+  border: 1px solid #d2c9ff;
+  height: 1px;
+  width: 100%;
+}
+.line-blue {
+  border: 1px solid #30a9e2;
+  width: 20px;
+  height: 1px;
+}
+
+.rmdp-container input {
+  width: 100%;
+  display: flex !important;
+  border-radius: 0 !important;
+}
+
+.time-off {
+  border: 1px solid #d2c9ff !important;
+  border-radius: 4px !important;
+  color: #34209b !important;
+  font-size: 13px;
+  background: transparent;
+  padding: 4px 12px;
+}
+.reject-all {
+  border: 1px solid #ff2200 !important;
+  border-radius: 4px !important;
+  padding: 5px 13px !important;
+  color: #ff2200 !important;
+  font-size: 13px;
+  background: transparent;
+}
+button.confirm {
+  background: #00b957 !important;
+  border-radius: 4px !important;
+  padding: 5px 14px !important;
+  color: #fff !important;
+  border: 1px solid #00b957 !important;
+  font-size: 13px;
+}
+
+.attend_card span {
+  font-size: 14px;
+  color: #000;
+}
+
+.attend_card h2 {
+  font-size: 34px;
+  font-weight: 400;
+}
+
+.daterangepicker input.rmdp-input {
+  margin: 0;
+  height: 47.5px;
+  border-left: 0;
+  border-color: #d2c9ff;
+}
+
+.rangelable {
+  padding: 10px 12px;
+  color: var(--Grey-Main, #afafaf);
+  font-size: 17px;
+  font-weight: 400;
+  background: transparent;
+}
+
+.rngcalendar {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.srchicon {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+}
+
+.srchemployee input {
+  padding-left: 35px !important;
+}
+
+.srchemployee input::placeholder {
+  font-size: 14px;
+  color: #afafaf;
+}
+.attend_card span {
+  font-size: 14px;
+  color: #000;
+}
+
+.attend_card h2 span {
+  font-size: 34px;
+  font-weight: 400;
+}
+
+.daterangepicker input.rmdp-input:focus {
+  box-shadow: none;
+  outline: none !important;
+}
+
+.srchicon {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+}
+
+.srchemployee input {
+  padding-left: 35px !important;
+}
+
+.srchemployee input::placeholder {
+  font-size: 14px;
+  color: #afafaf;
+}
+
+.MuiFormControl-root fieldset {
+  border-color: #d2c9ff !important;
+}
+
+.MuiFormControl-root:hover fieldset {
+  border-color: #d2c9ff !important;
+}
+
+button.site_tbtn {
+  border-radius: 4px;
+  border: 1px solid var(--Brand-Purple-Light, #d1c5ff);
+  background: var(--White, #fff);
+  color: var(--Brand-Purple-Dark, #160e31);
+  font-size: 13px;
+  padding: 7px 12px;
+}
+
+.attendence_btn .bgblue_btn {
+  font-size: 13px;
+  padding: 8px 14px;
+  font-weight: 400;
+  border: 0;
+  background: #30a9e2;
+  color: #fff;
+  border-radius: 4px;
+}
+
+.sitebtn.sendpayroll_btn {
+  min-width: auto;
+  height: auto;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.timesht_action svg {
+  display: block;
+  margin: 5px auto;
+  color: #00b957;
+  font-size: 16px;
+}
+
+.timesht_action {
+  line-height: normal;
+}
+
+.time_action {
+  padding: 5px 0;
+}
+.monthly_attndence {
+  background: #f0ecff;
+}
+.atn_hdng {
+  color: #34209b;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 150%;
+  margin-top: 15px;
+  margin-bottom: 0;
+}
+
+.monthly_attndence .react-calendar__tile:enabled:hover {
+  background-color: #fff !important;
+}
+
+.monthly_attndence .react-calendar__tile--active,
+.monthly_attndence .react-calendar__tile--active:enabled:hover,
+.monthly_attndence .react-calendar__tile--active:enabled:focus {
+  background: #fff !important;
+  color: #000;
+}
+
+.attndnc_tbl p {
+  margin-bottom: 0;
+}
+
+.timesht_noaction svg {
+  color: #afafaf;
+}
+
+.brkdwn_box p {
+  color: #585858;
+  font-size: 14px;
+  font-style: normal;
+  line-height: 150%; /* 18px */
+  margin: 0;
+  position: relative;
+  padding-left: 5px;
+}
+
+.brkdown_wrap {
+  padding: 0 10px;
+}
+
+.brkdwn_box {
+  padding-right: 10px;
+  margin-right: 28px;
+  border-right: 1px solid #afafaf;
+}
+
+.brkdwn_box:last-child {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.brkdwn_box p span {
+  padding-left: 5px;
+}
+
+.brkdwn_box p:before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 2px;
+  height: 16px;
+  width: 16px;
+  background: #eee;
+}
+
+.brkd_appr p::before {
+  background-color: #00b957;
+}
+.brkd_reject p::before {
+  background-color: #f20;
+}
+.brkd_pend p::before {
+  background-color: #afafaf;
+}
+
+.timesheettbles td,
+.timesheettbles span {
+  color: #000;
+}
+
+.timesheettbles.table th,
+.timesheettbles.table td {
+  border-color: #d2c9ff;
+}
+
+.prfimg_brf {
+  text-align: center;
+  border-bottom: 1px solid #d2c9ff;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+}
+
+.prfimg_brf img {
+  max-width: 115px;
+}
+
+.prfimg_brf h4 {
+  color: #160e31;
+  font-size: 16px;
+  line-height: 150%; /* 24px */
+}
+
+.prfimg_brf p {
+  color: #585858;
+  font-size: 14px;
+  line-height: 150%; /* 21px */
+  margin-bottom: 6px;
+}
+.attndc_brief {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.totalattnd h5 {
+  color: #000;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+  font-size: 16px;
+  margin: 0;
+}
+.totalattnd {
+  margin-bottom: 12px;
+  gap: 5px;
+}
+
+.totalattnd span {
+  color: #000;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.mini-det h5 {
+  color: #000;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 150%;
+  margin-bottom: 0;
+}
+
+.mini-det span {
+  color: #585858;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+.attendce_sideprofile {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.mini-det {
+  width: 80px;
+}
+
+.date_day {
+  gap: 5px;
+  align-items: center;
+}
+
+span.border-sec {
+  color: #000;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 0 8px;
+  width: 45px;
+  text-align: center;
+}
+
+.mini-det {
+  width: 80px;
+}
+
+.date_day {
+  gap: 8px;
+  align-items: center;
+}
+
+span.border-sec {
+  color: #000;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 0 8px;
+  width: 45px;
+  text-align: center;
+}
+
+.manual_daybx h6 {
+  color: #000;
+  font-size: 15px;
+  line-height: 150%;
+}
+
+.manual_daybx span {
+  color: #afafaf;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 150%; /* 18px */
+}
+
+.manual_daybx svg {
+  color: #30a9e2;
+}
+
+.status_leave p {
+  position: relative;
+  margin: 0;
+  border-radius: 12px;
+  background: aliceblue;
+  font-size: 13px;
+  color: #585858;
+  padding: 5px 20px;
+}
+
+p.tagapprove:before {
+  content: "";
+  position: absolute;
+  background: #00b957;
+  left: 8px;
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.timeperiod span {
+  color: #000;
+  font-size: 16px;
+  line-height: 150%; /* 24px */
+}
+
+.timeperiod {
+  gap: 5px;
+}
+
+.timeinput {
+  position: relative;
+}
+
+.timetext1 {
+  position: absolute;
+}
+
+.timeinput input {
+  border: 1px solid #d2c9ff;
+  border-radius: 4px;
+  width: 115px;
+}
+
+.inout_time {
+  justify-content: space-between;
+}
+
+.inout_time input[type="time"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+.inout_time {
+  position: relative;
+}
+
+.inout_time:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  height: 1px;
+  width: 50px;
+  background: #000;
+  transform: translateX(-50%);
+  top: 15px;
+}
+
+.loggedcolor p {
+  font-size: 15px;
+  margin: 0;
+}
+
+.notebox .form-label {
+  color: #000;
+  font-size: 16px;
+}
+
+.notebox .form-floating label {
+  font-size: 13px;
+}
+
+.total_workhrs span {
+  color: #afafaf;
+  font-size: 13px;
+  line-height: 150%;
+}
+
+.total_workhrs h6 {
+  color: #29166f;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+.total_workhrs svg {
+  color: #00b957;
+}
+
+button.cancelbtn {
+  background: transparent;
+  border: 0;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.savebtn {
+  border-radius: 6px;
+  background: #30a9e2;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100px;
+  height: 37px;
+}
+
+/* cstmcheck */
+
+/* src/components/CustomRadio.css */
+.custom-radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.customcheck-radio {
+  position: relative;
+  padding-left: 0px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.customcheck-radio input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark_check {
+    display: inline-block;
+    color: #000;
+    font-size: 14px;
+    min-width: 130px;
+    padding: 8px 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid var(--Purple-Light, #D2C9FF);
+    text-align: center;
+}
+
+.customcheck-radio input:checked ~ .checkmark_check {
+  background-color: #C1FFDE;
+  border-color: #C1FFDE;
+}
+
+.checkmark_check:after {
+  content: '\2713';
+  position: absolute;
+  display: none;
+}
+
+.customcheck-radio input:checked ~ .checkmark_check:after {
+  display: block;
+}
+
+.customcheck-radio .checkmark_check:after {
+    right: 14px;
+    top: 9px;
+}
+
+
+.timeoff_items p {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+}
+.color-darkpurple { color: #29166F !important; }
+
+.loggedcolor span {
+    color: #585858;
+}
+.purple-top {
+    height: 18px;
+    background: #29166F;
+}
+
+.postedjobs + .tab-content .MuiDataGrid-root { min-height:350px;}
+
+.MuiDataGrid-filler > div {
+  border: 0;
+}

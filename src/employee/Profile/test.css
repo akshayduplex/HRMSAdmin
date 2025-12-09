@@ -1,0 +1,30 @@
+/* Styling for tabs */
+.custom-tab .nav-link {
+    width: 500px;   /* Set the desired width for all tabs */
+    height: 50px;   /* Set the desired height for all tabs */
+    text-align: center; 
+    padding: 10px;  /* Padding for the text inside the tab */
+    font-weight: bold;  /* Bold text */
+    color: #000;    /* Default text color */
+    background-color: #f1f1f1; /* Light gray background for unselected tab */
+    border-radius: 5px;  /* Slight border-radius */
+}
+
+/* Active tab styling */
+.custom-tab .nav-link.active {
+    background-color: green !important;  /* Green background for active tab */
+    color: white !important; /* White text for active tab */
+}
+
+/* Document card styles */
+.document-card {
+    width: 200px;    /* Width of each card */
+    margin: 10px;    /* Margin between cards */
+    text-align: center; /* Center the text inside the card */
+    border: 1px solid #007bff; /* Optional: add border to card */
+}
+
+/* Optional: Button styling */
+.document-card .btn {
+    margin-top: 10px; /* Space between title and button */
+}

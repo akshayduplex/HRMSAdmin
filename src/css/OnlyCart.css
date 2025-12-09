@@ -1,0 +1,36 @@
+.document-box {
+    margin-top: 20px;
+  }
+  
+  .card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .card-text {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .card:hover {
+    border-color: #7f7fff;
+  }
+  
+  .active-card {
+    border-color: #28a745 !important; /* Highlight the active card */
+  }
+  
+  .active-card .card-text {
+    color: #28a745;
+  }

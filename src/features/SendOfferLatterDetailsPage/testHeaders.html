@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Letterhead Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --brand: #8dd3e6;
+            --footer: #5157af;
+            --text: #1d1e30;
+            --muted: #667085;
+            --font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Page + print setup */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: #fff;
+            color: var(--text);
+            font: 11pt/1.6 var(--font);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        @media print {
+            body {
+                display: block;
+            }
+
+            .page-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 999;
+                background: white;
+            }
+
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 999;
+                background: white;
+            }
+
+            main {
+                margin-top: 130px;
+                margin-bottom: 100px;
+                padding: 0 10mm;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        @media screen {
+            main {
+                flex: 1;
+                padding: 5px 5mm;
+            }
+        }
+
+        /* Header */
+        .page-header {
+            padding: 6mm 10mm 4mm;
+        }
+
+        .header-lines {
+            height: 6px;
+            background:
+                linear-gradient(var(--brand), var(--brand)) top left / 100% 5px no-repeat;
+            margin-bottom: 12px;
+        }
+
+        .branding {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .branding .logo {
+            width: auto;
+            object-fit: contain;
+            margin: 15px;
+            opacity: 0.7;
+        }
+
+        .branding .org {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .org .name {
+            font-weight: 700;
+            font-size: 13pt;
+            letter-spacing: 0.3px;
+            color: var(--text);
+        }
+
+        .org .tagline {
+            color: var(--muted);
+            font-size: 9.5pt;
+            margin-top: 2px;
+        }
+
+        /* Footer */
+        .page-footer {
+            padding: 4mm 10mm 6mm;
+        }
+
+        .footer-lines {
+            height: 6px;
+            background:
+                linear-gradient(var(--footer), var(--footer)) bottom left / 100% 7px no-repeat;
+            margin-bottom: 10px;
+        }
+
+        .footnote {
+            color: var(--muted);
+            font-size: 9pt;
+            line-height: 1.5;
+            text-align: start;
+        }
+
+        .footnote .sep {
+            margin: 0 8px;
+            color: #98a2b3;
+        }
+
+        /* Content */
+        .doc {
+            max-width: 100%;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 10pt;
+            margin-bottom: 16px;
+        }
+
+        /* .meta-item {
+            margin: 4px 0;
+        } */
+
+        h1 {
+            font-size: 16pt;
+            font-weight: 700;
+            margin: 20px 0 16px;
+            color: var(--text);
+        }
+
+        h2 {
+            font-size: 12pt;
+            font-weight: 600;
+            margin: 16px 0 10px;
+            color: var(--text);
+        }
+
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+
+        ul,
+        ol {
+            margin: 10px 0 10px 24px;
+        }
+
+        li {
+            margin: 6px 0;
+        }
+
+        .recipient {
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .greeting {
+            margin: 16px 0;
+        }
+
+        .signature {
+            margin-top: 40px;
+        }
+
+        .sign-line {
+            height: 1px;
+            background: #cbd5e1;
+            width: 200px;
+            margin: 50px 0 8px;
+        }
+
+        .sign-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .sign-title {
+            color: var(--muted);
+            font-size: 10pt;
+        }
+
+        /* Print button */
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11pt;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .print-btn:hover {
+            opacity: 0.9;
+        }
+
+        .comanyname {
+            display: block;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Print Button -->
+    <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
+
+    <!-- HEADER -->
+    <header class="page-header">
+        <div class="header-lines"></div>
+        <div class="branding">
+            <img class="logo" src="http://localhost:3000/static/media/logo.53ed9f64c4c1cad674a1.png"
+                alt="Organization Logo" />
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="page-footer">
+        <div class="footnote">
+            <span class="comanyname">
+                Hindustan Latex Family Planning Promotion Trust
+            </span>
+            <span class="comanyname">
+                (A Trust Promoted by HLL Lifecare Ltd. )
+            </span>
+            <span style="font-weight: 500;">Corporate Address:</span> B-14A, 2nd Floor, Sector-62, NOIDA - 201307,
+            Gautam Budh Nagar (UP)<br>
+            Tel: 0120-4576300 <span class="sep">|</span> Email: info@hlfppt.org <span class="sep">|</span> Website:
+            www.hlfppt.org
+        </div>
+        <div class="footer-lines"></div>
+    </footer>
+
+</body>
+
+</html>

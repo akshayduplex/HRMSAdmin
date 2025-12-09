@@ -1,0 +1,96 @@
+h5.chart_hdng {
+  color: #160E31;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+  margin-bottom: 15px;
+}
+
+.chart_selectbx select {
+  max-width: 250px;
+  margin-bottom: 20px;
+}
+
+.ratiorow {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ratiorow img {
+  height: 130px;
+  object-fit: contain;
+}
+
+
+.pstnbox {
+  background: #BFE7FA;
+  text-align: center;
+  padding: 20px;
+  min-width: 150px;
+}
+
+.postncenter {
+  max-width: 60%;
+  margin: 30px auto 40px;
+}
+
+.pstnbox h5 {
+  color: #000;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 400;
+}
+.postnwrap {
+  padding-bottom: 100px;
+}
+.pstnbox p {
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 150%; /* 41.346px */
+  color: #000;
+  margin: 0;
+}
+
+.pstnbox h4 {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.postncenter .pstnbox p {
+  font-size: 40px;
+}
+
+
+.geomap img {
+  width: 100%;
+}
+
+.geomap {
+  margin-bottom: 20px;
+}
+
+.location_employees ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+}
+
+.location_employees ul li {
+  font-size: 14px;
+  padding-right: 12px;
+  border-right: 1px solid #000;
+  color: #000;
+}
+
+.location_employees ul li:last-child {
+  border: 0;
+}
+
+
+.totl_empcount h5 {
+  font-size: 15px;
+}
