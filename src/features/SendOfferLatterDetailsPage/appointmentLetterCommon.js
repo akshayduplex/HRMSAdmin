@@ -181,6 +181,13 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
       borderBottomColor: '#d9dfe8',
       lineHeight: 1.5,
     },
+
+    footer: {
+      position: 'absolute',
+      bottom: 20,
+      left: SIDE_PADDING_MM,
+      right: SIDE_PADDING_MM,
+    },
   });
 
   useEffect(() => {
@@ -462,6 +469,9 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     const documentTitle = previewData?.template_for || previewData?.doc_category || previewData;
 
     const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
+    console.log("PDF data for pdfstyles", pdfStyles)
+    console.log("PDF data for websitting", webSettingData)
+
     return () => (
       <Document title={documentTitle}>
         <Page size="A4" style={pdfStyles.page}>
@@ -491,7 +501,8 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
           <View style={pdfStyles.content}>
             {parsedPdfContent}
           </View>
-          <View style={pdfStyles.footer} fixed>
+
+          <View style={pdfStyles.footer}>
             <Text style={pdfStyles.companyName}>
               {webSettingData?.meta_title}
             </Text>
@@ -604,7 +615,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
             }
     
             .print-table tfoot {
-              display: table-footer-group;
+              display: none;
             }
     
             .print-table td {
@@ -678,8 +689,8 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     
             /* ===== FOOTER - FIXED at bottom of every page ===== */
             .page-footer {
-              position: fixed;
-              bottom: 0;
+              position: absolute;
+              top: 270mm;
               left: 0;
               right: 0;
               width: 100%;
@@ -1339,6 +1350,20 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
         `,
   });
 
+  const processedHtmlDescription = useMemo(() => {
+    if (!templateDescription) return "";
+    let html = templateDescription;
+    if (webSettingData?.hod_hr_signature) {
+      html = html.replace(
+        /{#signature}/g,
+        `<img src="${config.IMAGE_PATH + webSettingData.hod_hr_signature}" width="70" height="70" alt="Signature"/>`
+      );
+    } else {
+      html = html.replace(/{#signature}/g, '');
+    }
+    return html;
+  }, [templateDescription, webSettingData]);
+
   return (
     <div>
       {hasContent && (
@@ -1477,17 +1502,11 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
                   <tbody>
                     <tr>
                       <td className="content-cell">
-                        <div className="print-content" dangerouslySetInnerHTML={{ __html: templateDescription }} />
+                        <div className="print-content" dangerouslySetInnerHTML={{ __html: processedHtmlDescription }} />
                       </td>
                     </tr>
                   </tbody>
-                  <tfoot>
-                    <tr>
-                      <td>
-                        <div className="footer-space">&nbsp;</div>
-                      </td>
-                    </tr>
-                  </tfoot>
+
                 </table>
 
                 {/* FOOTER */}

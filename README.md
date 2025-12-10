@@ -3,51 +3,42 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
+  const PdfDocument = useMemo(() => {
+    const documentTitle = previewData?.template_for || previewData?.doc_category || previewData;
 
-const PdfDocument = useMemo(() => {
-  const documentTitle = previewData?.template_for || previewData?.doc_category || previewData;
-  const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
+    const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
+    return () => (
+      <Document title={documentTitle}>
+        <Page size="A4" style={pdfStyles.page}>
 
-  return () => (
-    <Document title={documentTitle}>
-      
-      <Page
-        size="A4"
-        style={pdfStyles.page}
-        render={({ pageNumber, totalPages }) => (
-          <View style={{ flex: 1 }}>
+          {webSettingData?.water_mark_file && (
+            <View style={pdfStyles.watermarkContainer} fixed>
+              <Image
+                style={pdfStyles.watermark}
+                src={config.IMAGE_PATH + webSettingData.water_mark_file}
+              />
+            </View>
+          )}
 
-            {/* Watermark */}
-            {webSettingData?.water_mark_file && (
-              <View style={pdfStyles.watermarkContainer} fixed>
+
+          <View style={pdfStyles.header} fixed>
+            <View style={pdfStyles.headerLines} />
+            <View style={pdfStyles.branding}>
+              {webSettingData?.logo_image && (
                 <Image
-                  style={pdfStyles.watermark}
-                  src={config.IMAGE_PATH + webSettingData.water_mark_file}
+                  style={pdfStyles.logo}
+                  src={config.IMAGE_PATH + webSettingData.logo_image}
                 />
-              </View>
-            )}
-
-            {/* Header (always visible) */}
-            <View style={pdfStyles.header} fixed>
-              <View style={pdfStyles.headerLines} />
-              <View style={pdfStyles.branding}>
-                {webSettingData?.logo_image && (
-                  <Image
-                    style={pdfStyles.logo}
-                    src={config.IMAGE_PATH + webSettingData.logo_image}
-                  />
-                )}
-              </View>
+              )}
             </View>
+          </View>
 
-            {/* MAIN CONTENT */}
-            <View style={pdfStyles.content}>
-              {parsedPdfContent}
-            </View>
-
-            {/* FOOTER — only on FIRST + LAST page */}
-            {(pageNumber === 1 || pageNumber === totalPages) && (
-              <View style={pdfStyles.footer} fixed>
+          <View style={pdfStyles.content}>
+            {parsedPdfContent}
+          </View>
+          <View style={pdfStyles.footer} fixed render={({ pageNumber, totalPages }) => (
+            (pageNumber === 1) ? (
+              <View style={{ width: '100%' }}>
                 <Text style={pdfStyles.companyName}>
                   {webSettingData?.meta_title}
                 </Text>
@@ -77,17 +68,13 @@ const PdfDocument = useMemo(() => {
 
                 <View style={pdfStyles.footerLines} />
               </View>
-            )}
+            ) : null
+          )} />
 
-          </View>
-        )}
-      />
-
-    </Document>
-  );
-}, [parsedPdfContent, webSettingData, previewData, showSignature]);
-
-
+        </Page>
+      </Document>
+    );
+  }, [parsedPdfContent, webSettingData, previewData]);
 In the project directory, you can run:
 
 ### `npm start`
