@@ -253,16 +253,6 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     return false;
   }, []);
 
-  const pagesWithSignature = useMemo(() => {
-    if (!templateDescription) return new Set();
-    const hasSignature = templateDescription.includes("{#signature}");
-    return hasSignature ? new Set([0]) : new Set();
-  }, [templateDescription]);
-
-  const showFooterText = true;
-  const showSignatureInFooter = (pageIndex) =>
-    !pagesWithSignature.has(pageIndex) && webSettingData?.hod_hr_signature;
-
   const parsedPdfContent = useMemo(() => {
     if (!templateDescription) return [];
 
@@ -476,7 +466,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     }
 
     return validElements.map((el, i) => parseElement(el, i)).filter(Boolean);
-  }, [templateDescription, parseInlineText, hasSkipClass, webSettingData, pdfStyles]);
+  }, [templateDescription, parseInlineText, hasSkipClass, webSettingData, pdfStyles]); // FIXED: Added dependencies
 
   let showSignature = useMemo(() => {
     if (previewData?.template_for === "Appointment Letter") {
@@ -489,25 +479,15 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
   const PdfDocument = useMemo(() => {
     const documentTitle = previewData?.template_for || previewData?.doc_category || previewData;
     const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
-
     // -------- MANUAL PAGE SPLITTING --------
-    const FIRST_PAGE_LIMIT = 16;
+    const FIRST_PAGE_LIMIT = 16; // adjust manually
     const firstPageContent = parsedPdfContent.slice(0, FIRST_PAGE_LIMIT);
     const remainingContent = parsedPdfContent.slice(FIRST_PAGE_LIMIT);
-
-    const hasSignatureInContent = (content) => {
-      return content.some(item => {
-        if (item && item.type === Image) {
-          return true;
-        }
-
-        return false;
-      });
-    };
 
     return () => (
       <Document title={documentTitle}>
 
+        {/* PAGE 1 (HEADER + FOOTER + FIRST PART OF CONTENT) */}
         <Page size="A4" style={pdfStyles.page}>
 
           {/* watermark */}
@@ -536,7 +516,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
             {firstPageContent}
           </View>
 
-          {/* footer on first page - WITH webSetting data */}
+          {/* footer only on first page */}
           <View style={pdfStyles.footer} fixed>
             <Text style={pdfStyles.companyName}>{webSettingData?.meta_title}</Text>
             <Text style={pdfStyles.address}> <span style={{ fontWeight: 'bold' }}>Corporate Office:</span> {webSettingData?.office_address}</Text>
@@ -560,9 +540,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
                 {cleanWebsite}
               </Link>
             </Text>
-
-            {/* Condition: Show signature only if not already in content */}
-            {showSignature && !hasSignatureInContent(firstPageContent) && webSettingData?.hod_hr_signature && (
+            {showSignature && (
               <Image
                 style={{ width: 100, height: 60, position: 'absolute', right: 5, bottom: 1 }}
                 src={config.IMAGE_PATH + webSettingData?.hod_hr_signature}
@@ -573,52 +551,29 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
           </View>
         </Page>
 
-        {/* ADDITIONAL PAGES */}
         {remainingContent.length > 0 && (
-          (() => {
-            const pages = [];
-            const itemsPerPage = 30;
+          <Page size="A4" style={pdfStyles.page}>
 
-            for (let i = 0; i < remainingContent.length; i += itemsPerPage) {
-              const pageContent = remainingContent.slice(i, i + itemsPerPage);
-              const pageNum = Math.floor(i / itemsPerPage) + 2;
+            <View style={{ marginBottom: 10 }} fixed>
+              <View style={pdfStyles.headerLines} />
+              {webSettingData?.logo_image && (
+                <Image
+                  style={pdfStyles.logo}
+                  src={config.IMAGE_PATH + webSettingData.logo_image}
+                />
+              )}
+            </View>
 
-              pages.push(
-                <Page key={`page-${pageNum}`} size="A4" style={pdfStyles.page}>
-                  {/* header on every page */}
-                  <View style={{ marginBottom: 10 }} fixed>
-                    <View style={pdfStyles.headerLines} />
-                    {webSettingData?.logo_image && (
-                      <Image
-                        style={pdfStyles.logo}
-                        src={config.IMAGE_PATH + webSettingData.logo_image}
-                      />
-                    )}
-                  </View>
-
-                  <View style={pdfStyles.content}>
-                    {pageContent}
-                  </View>
-
-                  <View style={pdfStyles.footer} fixed>
-                    {showSignature && !hasSignatureInContent(pageContent) && webSettingData?.hod_hr_signature && (
-                      <Image
-                        style={{ width: 100, height: 60, position: 'absolute', right: 5, bottom: 1 }}
-                        src={config.IMAGE_PATH + webSettingData?.hod_hr_signature}
-                      />
-                    )}
-                    <View style={pdfStyles.footerLines} />
-                  </View>
-                </Page>
-              );
-            }
-            return pages;
-          })()
+            <View style={pdfStyles.content}>
+              {remainingContent}
+            </View>
+          </Page>
         )}
 
       </Document>
     );
   }, [parsedPdfContent, webSettingData, previewData]);
+
 
 
   const handlePrint = useReactToPrint({
