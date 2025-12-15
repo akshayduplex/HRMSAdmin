@@ -9,6 +9,7 @@ import config from '../../../config/config';
 import { apiHeaderToken } from '../../../config/api_header';
 import PrintIcon from '@mui/icons-material/Print';
 import { useReactToPrint } from 'react-to-print';
+import { formatDate } from '../../../utils/common';
 
 
 const DeclarationForm = ({ candidateData }) => {
@@ -508,7 +509,7 @@ const DeclarationForm = ({ candidateData }) => {
                                             borderBottom: '2px solid #e0e0e0',
                                             pb: 1
                                         }}>
-                                            {moment().format("DD/MM/YYYY")}
+                                            {formatDate(new Date())}
                                         </Typography>
                                     </Grid>
 

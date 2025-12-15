@@ -4,7 +4,7 @@ import config from "../../config/config";
 import PrintIcon from "@mui/icons-material/Print";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { useReactToPrint } from "react-to-print";
-import { Document, Page, Text, View, StyleSheet, PDFViewer, Image, Link } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, PDFViewer, Image, Link, pdf } from '@react-pdf/renderer';
 
 
 const HEADER_HEIGHT_MM = 32;
@@ -18,7 +18,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
   const hasContent = Boolean(templateDescription?.trim());
   const formRef = useRef(null);
   const [activeTab, setActiveTab] = useState(1);
-
+  const [isPrinting, setIsPrinting] = useState(false);
   const pdfStyles = StyleSheet.create({
     page: {
       size: 'A4',
@@ -491,7 +491,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://");
 
     // -------- MANUAL PAGE SPLITTING --------
-    const FIRST_PAGE_LIMIT = 16;
+    const FIRST_PAGE_LIMIT = 15;
     const firstPageContent = parsedPdfContent.slice(0, FIRST_PAGE_LIMIT);
     const remainingContent = parsedPdfContent.slice(FIRST_PAGE_LIMIT);
 
@@ -620,6 +620,53 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
     );
   }, [parsedPdfContent, webSettingData, previewData]);
 
+  const handlePrintPdf = useCallback(async () => {
+    if (isPrinting) return;
+    setIsPrinting(true);
+
+    try {
+      // Generate the PDF as Blob
+      const blob = await pdf(<PdfDocument />).toBlob();
+
+      // Create a temporary object URL
+      const url = URL.createObjectURL(blob);
+
+      // Create a hidden iframe (not visible to user)
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.style.position = 'absolute';
+      iframe.style.width = '0px';
+      iframe.style.height = '0px';
+      iframe.src = url;
+
+      document.body.appendChild(iframe);
+
+      // Wait for iframe to load the PDF, then trigger print
+      iframe.onload = () => {
+        try {
+          const win = iframe.contentWindow;
+          if (win) {
+            win.focus();
+            win.print(); // ← This opens the native Print dialog
+          }
+        } catch (e) {
+          console.warn('Print failed', e);
+        }
+
+        // Clean up after a short delay (so print dialog can stay open)
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+          URL.revokeObjectURL(url);
+          setIsPrinting(false);
+        }, 2000);
+      };
+
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      alert('Error generating PDF for printing.');
+      setIsPrinting(false);
+    }
+  }, [PdfDocument]);
 
   const handlePrint = useReactToPrint({
     contentRef: formRef,
@@ -1463,20 +1510,13 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
         <Box sx={{ textAlign: "center", display: "flex", gap: 2, alignItems: "center", justifyContent: "center", mb: 2 }}>
           <Button
             variant="contained"
-            sx={{ textAlign: "center", alignItems: "center" }}
             color="primary"
             startIcon={<PrintIcon />}
-            onClick={() => {
-              // Switch to HTML tab for printing
-              setActiveTab(0);
-              // Small delay to ensure the tab switch completes before printing
-              setTimeout(() => {
-                handlePrint();
-              }, 100);
-            }}
+            onClick={handlePrintPdf}
+            disabled={isPrinting}
             className="screen-only"
           >
-            Print Letter
+            {isPrinting ? 'Generating PDF...' : 'Print Letter'}
           </Button>
         </Box>
       )}
@@ -1491,195 +1531,35 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
                       </Box>
                     )} */}
 
-      <Box sx={{ display: "flex", justifyContent: "center", minHeight: hasContent ? undefined : 200, px: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", px: 2 }}>
         {hasContent ? (
           <>
-            {/* HTML Preview Tab */}
-            {activeTab === 0 && (
-              <Box
-                ref={formRef}
-                className="MuiPaper-root print-content-only"
-                sx={{
-                  width: "210mm",
-                  // display:'none',
-                  mx: "auto",
-                  bgcolor: "background.paper",
-                  p: 4,
-                  fontSize: '4.5mm',
-                  boxShadow: 3,
-                  "& table": {
-                    width: "100% !important",
-                    borderCollapse: "collapse",
-                  },
-                  "& b, strong , h4, h4": {
-                    fontSize: '4.5mm',
-                  },
-                  "& .headerContent": {
-                    display: 'none !important',
-                  },
-                  "& .watermark": {
-                    display: 'none',
-                  },
-                  "& figure.table": {
-                    border: "0.1px solid",
-                  },
-                  "& .screen-only-watermark": {
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%) scale(0.8)',
-                    opacity: 0.08,
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                    width: '160mm',
-                    maxWidth: '80%',
-                  },
-                  position: "relative",
-                  "@media print": {
-                    width: "100%",
-                    boxShadow: "none",
-                    border: "none !important",
-                    bgcolor: "white !important",
-                    "& table": {
-                      width: "100% !important",
-                    },
-                    m: 0,
-                    p: 0,
-                    "& .headerContent": {
-                      display: "none !important",
-                    },
-                    "& .watermark": {
-                      display: 'block !important'
-                    },
-                    "& .screen-only-watermark": {
-                      display: 'none !important'
-                    },
-                  },
-                }}
+            <Box sx={{ textAlign: "center", mb: 2 }}>
+              {/* <Button
+                variant="contained"
+                color="primary"
+                startIcon={<PrintIcon />}
+                onClick={handlePrintPdf}
               >
-                {/* Watermark (behind content) */}
-                <img
-                  className="watermark"
-                  src={config.IMAGE_PATH + webSettingData?.water_mark_file}
-                  alt="watermark"
-                />
+                Print Letter
+              </Button> */}
+            </Box>
 
-                <img
-                  className="screen-only-watermark"
-                  src={config.IMAGE_PATH + webSettingData?.water_mark_file}
-                  alt="watermark"
-                />
-
-                {/* HEADER */}
-                <header className="page-header">
-                  <div className="no-print" style={{ borderTop: `5px solid ${webSettingData?.header_color}`, height: "10px" }}></div>
-                  <div className="header-lines"></div>
-                  <div className="branding">
-                    <img
-                      className="logo"
-                      src={config.IMAGE_PATH + webSettingData?.logo_image}
-                      alt="Organization Logo"
-                    />
-                  </div>
-                </header>
-
-                {/* TABLE STRUCTURE FOR CONTENT FLOW */}
-                <table className="print-table">
-                  <thead>
-                    <tr>
-                      <td>
-                        <div className="header-space">&nbsp;</div>
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="content-cell">
-                        <div className="print-content" dangerouslySetInnerHTML={{ __html: processedHtmlDescription }} />
-                      </td>
-                    </tr>
-                  </tbody>
-
-                  <tfoot>
-                    <tr>
-                      <td>
-                        <div className="footer-space">&nbsp;</div>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-
-                {/* FOOTER */}
-                <footer className="page-footer">
-                  <div className="footnote">
-                    <span className="comanyname">{webSettingData?.meta_title}</span>
-
-                    <div className="address">
-                      {webSettingData?.office_address}
-                    </div>
-
-                    <div className="contact">
-                      Tel: {webSettingData?.organization_mobile_no}
-
-                      <span className="sep">|</span>
-
-                      Email:
-                      <a
-                        href={`mailto:${webSettingData?.organization_email_id}`}
-                        style={{ marginLeft: 4, color: "#1976d2", textDecoration: "none" }}
-                      >
-                        {webSettingData?.organization_email_id}
-                      </a>
-
-                      <span className="sep">|</span>
-
-                      Website:
-                      <a
-                        href={webSettingData?.website_link?.replace("https://hrms.", "https://")}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ marginLeft: 4, color: "#1976d2", textDecoration: "none" }}
-                      >
-                        {webSettingData?.website_link?.replace("https://hrms.", "https://")}
-                      </a>
-                    </div>
-                  </div>
-                  {
-                    showSignature && (
-                      <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
-                        <img src={`${config.IMAGE_PATH}${webSettingData?.hod_hr_signature}`} alt="signature" style={{ width: 100, height: 60 }} />
-                      </div>
-                    )
-                  }
-
-
-                  <div className="footer-lines"></div>
-                </footer>
-              </Box>
-            )}
-
-            {/* PDF Preview Tab */}
-            {activeTab === 1 && (
-              <Box sx={{
-                width: "210mm",
-                height: "297mm",
-                mx: "auto",
-                border: '1px solid #ccc',
-                boxShadow: 3,
-                overflow: 'hidden',
-                bgcolor: "background.paper",
-                position: "relative",
-              }}>
-                <PDFViewer width="100%" height="100%" style={{ border: 'none' }}>
-                  <PdfDocument />
-                </PDFViewer>
-              </Box>
-            )}
+            <Box sx={{
+              width: "210mm",
+              height: "297mm",
+              mx: "auto",
+              border: '1px solid #ccc',
+              boxShadow: 3,
+              overflow: 'hidden',
+            }}>
+              <PDFViewer width="100%" height="100%">
+                <PdfDocument />
+              </PDFViewer>
+            </Box>
           </>
         ) : (
-          <Box component="h5" sx={{ m: 0 }}>
-            No Data Found
-          </Box>
+          <Box component="h5">No Data Found</Box>
         )}
       </Box>
 

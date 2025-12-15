@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import config from '../../../config/config';
 import moment from 'moment';
 import PrintIcon from '@mui/icons-material/Print';
-import { CamelCases } from '../../../utils/common';
+import { CamelCases, formatDate } from '../../../utils/common';
 import CreateIcon from '@mui/icons-material/Create';
 import { useReactToPrint } from 'react-to-print';
 
@@ -260,8 +260,10 @@ const ApplicantForm = ({ candidate_data, setEditApplicant }) => {
                                 }}
                             >
                                 {
-                                    (!["Applied", "Shortlisted"].includes(appliedJob?.form_status) && Array.isArray(appliedJob?.interviewer) && appliedJob?.interviewer.length > 0) ?
-                                        moment(appliedJob?.interview_date).format('DD/MM/YYYY') || "\u00A0"
+                                    (!["Applied", "Shortlisted"].includes(appliedJob?.form_status) &&
+                                        Array.isArray(appliedJob?.interviewer) &&
+                                        appliedJob?.interviewer.length > 0)
+                                        ? moment(appliedJob?.interview_date).format('D MMMM,YYYY') || "\u00A0"
                                         : "\u00A0"
                                 }
                             </Typography>
@@ -1442,18 +1444,18 @@ const ApplicantForm = ({ candidate_data, setEditApplicant }) => {
                                                                 <TableCell sx={{ borderRight: 1, borderColor: '#ddd', py: 0.5, px: 1 }}>
                                                                     <Grid container gap={1}>
                                                                         <Grid item sx={6}>
-                                                                            {item?.duration_from}
+                                                                            {formatDate(item?.duration_from)}
                                                                         </Grid>
                                                                         <Grid item sx={12}>
                                                                             {"To"}
                                                                         </Grid>
                                                                         <Grid item sx={6}>
-                                                                            {item?.duration_to}
+                                                                            {formatDate(item?.duration_to)}
                                                                         </Grid>
                                                                     </Grid>
                                                                 </TableCell>
                                                                 <TableCell sx={{ borderRight: 1, borderColor: '#ddd', py: 0.5, px: 1 }}>
-                                                                    {item?.passing_year}
+                                                                    {formatDate(item?.passing_year)}
                                                                 </TableCell>
                                                                 <TableCell sx={{ borderRight: 1, borderColor: '#ddd', py: 0.5, px: 1 }}>
                                                                     {item?.course_type === 'full_time' ? "Full Time" : 'Part Time'}
@@ -1531,13 +1533,13 @@ const ApplicantForm = ({ candidate_data, setEditApplicant }) => {
                                                                 <TableCell sx={{ borderRight: 1, borderColor: '#ddd', py: 0.5, px: 1 }}>
                                                                     <Grid container gap={1}>
                                                                         <Grid item sx={6}>
-                                                                            {item?.duration_from}
+                                                                            {formatDate(item?.duration_from)}
                                                                         </Grid>
                                                                         <Grid item sx={12}>
                                                                             {"To"}
                                                                         </Grid>
                                                                         <Grid item sx={6}>
-                                                                            {item?.duration_to}
+                                                                            {formatDate(item?.duration_to)}
                                                                         </Grid>
                                                                     </Grid>
                                                                 </TableCell>
@@ -1633,13 +1635,13 @@ const ApplicantForm = ({ candidate_data, setEditApplicant }) => {
                                                                 <TableCell sx={{ borderRight: 1, borderColor: '#ddd', py: 0.5, px: 1 }}>
                                                                     <Grid container spacing={1}>
                                                                         <Grid item>
-                                                                            {item?.duration_from}
+                                                                            {formatDate(item?.duration_from)}
                                                                         </Grid>
                                                                         <Grid item>
                                                                             To
                                                                         </Grid>
                                                                         <Grid item>
-                                                                            {item?.duration_to}
+                                                                            {formatDate(item?.duration_to)}
                                                                         </Grid>
                                                                     </Grid>
                                                                 </TableCell>
@@ -1924,7 +1926,7 @@ const ApplicantForm = ({ candidate_data, setEditApplicant }) => {
                                 <Box display="flex" alignItems="center" mb={1}>
                                     <Typography variant="body2" fontWeight="bold" mr={1}>Date:</Typography>
                                     <Box borderBottom="1px solid #000" flex={1} minHeight={24} px={0.5}>
-                                        <Typography variant="body2">{moment().format("DD-MM-YYYY")}</Typography>
+                                        <Typography variant="body2"> {formatDate(new Date())}</Typography>
                                     </Box>
                                 </Box>
 

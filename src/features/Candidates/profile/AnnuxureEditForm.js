@@ -13,6 +13,7 @@ import axios from 'axios';
 import config from '../../../config/config';
 import { apiHeaderTokenMultiPart } from '../../../config/api_header';
 import { toast } from 'react-toastify';
+import { formatDate } from '../../../utils/common';
 
 
 const JoiningReportFormAddEdit = ({ candidateData, setEditApplicant }) => {
@@ -161,9 +162,9 @@ const JoiningReportFormAddEdit = ({ candidateData, setEditApplicant }) => {
             fatherName: candidateData?.applicant_form_data?.father_hushband_name || "",
             placeOfPosting: candidateData?.applied_jobs?.find((item) => item?.job_id === candidateData?.job_id)?.proposed_location || candidateData?.location,
             employeeNo: '',
-            reportingTime: '',
+            reportingTime: candidateData?.annexure_eleven_form_data?.reporting_time || '',
             designation: candidateData?.designation,
-            reportingManager: '',
+            reportingManager: candidateData?.annexure_eleven_form_data?.reporting_manager || '',
             addressCommunication: candidateData?.applicant_form_data?.communication_address?.address || '',
             contactNos: candidateData?.applicant_form_data?.communication_address?.mobile_no || '',
             mailIds: candidateData?.applicant_form_data?.communication_address?.email_id || '',
@@ -172,30 +173,30 @@ const JoiningReportFormAddEdit = ({ candidateData, setEditApplicant }) => {
             permanentContactEmail: candidateData?.applicant_form_data?.permanent_address?.email_id || '',
             sex: candidateData?.applicant_form_data?.gender || "",
             maritalStatus: candidateData?.applicant_form_data?.marital_status || "",
-            dateOfWedding:candidateData?.annexure_eleven_form_data?.dateOfWedding || '',
+            dateOfWedding: candidateData?.annexure_eleven_form_data?.dateOfWedding || '',
             noOfChildrenMale: candidateData?.annexure_eleven_form_data?.noOfChildrenMale || '',
             noOfChildrenFemale: candidateData?.annexure_eleven_form_data?.noOfChildrenFemale || '',
-            bloodGroup:candidateData?.annexure_eleven_form_data?.blood_group || '',
-            panNo:candidateData?.annexure_eleven_form_data?.pan_number || '',
-            emergencyContactLocalName:candidateData?.annexure_eleven_form_data?.emergency_contact_local?.name || '',
+            bloodGroup: candidateData?.annexure_eleven_form_data?.blood_group || '',
+            panNo: candidateData?.annexure_eleven_form_data?.pan_number || '',
+            emergencyContactLocalName: candidateData?.annexure_eleven_form_data?.emergency_contact_local?.name || '',
             emergencyContactLocalContact: candidateData?.annexure_eleven_form_data?.emergency_contact_local?.contact_no || '',
             emergencyContactLocalAddress: candidateData?.annexure_eleven_form_data?.emergency_contact_local?.address || '',
-            emergencyContactPermanentName:candidateData?.annexure_eleven_form_data?.emergency_contact_permanent?.name || '',
+            emergencyContactPermanentName: candidateData?.annexure_eleven_form_data?.emergency_contact_permanent?.name || '',
             emergencyContactPermanentContact: candidateData?.annexure_eleven_form_data?.emergency_contact_permanent?.contact_no || '',
-            emergencyContactPermanentAddress:candidateData?.annexure_eleven_form_data?.emergency_contact_permanent?.address || '',
-            bankName: candidateData?.annexure_eleven_form_data?.bank_details?.bank_name || ''  ,
+            emergencyContactPermanentAddress: candidateData?.annexure_eleven_form_data?.emergency_contact_permanent?.address || '',
+            bankName: candidateData?.annexure_eleven_form_data?.bank_details?.bank_name || '',
             branchIFSC: candidateData?.annexure_eleven_form_data?.bank_details?.branch_ifsc || '',
-            accountNo:candidateData?.annexure_eleven_form_data?.bank_details?.account_no || ''  ,
+            accountNo: candidateData?.annexure_eleven_form_data?.bank_details?.account_no || '',
             previousOrganization: previousEmp[0]?.org_name,
             previousDesignation: previousEmp[0]?.designation,
-            previousReportingManagerName:candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_name || '',
-            previousReportingManagerDesignation:candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_designation || '',
-            previousReportingManagerMob: previousEmp[0]?.reporting_person_mobile || '',
-            previousReportingManagerEmail: previousEmp[0]?.reporting_person_email || "",
+            previousReportingManagerName: candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_name || '',
+            previousReportingManagerDesignation: candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_designation || '',
+            previousReportingManagerMob: candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_mobile_no || '',
+            previousReportingManagerEmail: candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_email || "",
             previousTenureFrom: moment(appliedJobDetails && previousEmp[0]?.duration_from).format('YYYY-MM-DD') || '',
             previousTenureTo: moment(appliedJobDetails && previousEmp[0]?.duration_to).format('YYYY-MM-DD') || '',
-            pfAccountNo:candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_pf || '',
-            uan:candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_pan_no || '',
+            pfAccountNo: candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_pf || '',
+            uan: candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_pan_no || '',
             declaration: false,
             cancelCheque: ''
         },
@@ -1253,7 +1254,7 @@ const JoiningReportFormAddEdit = ({ candidateData, setEditApplicant }) => {
                                         Date
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                        {moment().format('DD/MM/YYYY')}
+                                        {formatDate(new Date())}
                                     </Typography>
                                 </Paper>
                             </Grid>

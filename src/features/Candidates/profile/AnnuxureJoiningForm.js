@@ -9,9 +9,9 @@ import config from '../../../config/config';
 import moment from 'moment';
 import CreateIcon from '@mui/icons-material/Create';
 import { useReactToPrint } from 'react-to-print';
+import { formatDate } from '../../../utils/common';
 
 const JoiningReportForm = ({ candidateData, setEditApplicant }) => {
-
     const formRef = useRef();
 
     const handlePrint = useReactToPrint({
@@ -150,8 +150,8 @@ const JoiningReportForm = ({ candidateData, setEditApplicant }) => {
                     <Grid container spacing={2} sx={{ mb: 2 }}>
                         {[
                             { label: 'Name', value: candidateData?.name || "____" },
-                            { label: 'Date of Joining', value: candidateData?.annexure_eleven_form_data?.candidate_doj || "____" },
-                            { label: 'Date of Birth', value: candidateData?.annexure_eleven_form_data?.candidate_dob || "" },
+                            { label: 'Date of Joining', value: formatDate(candidateData?.annexure_eleven_form_data?.candidate_doj) || "____" },
+                            { label: 'Date of Birth', value: formatDate(candidateData?.annexure_eleven_form_data?.candidate_dob) || "" },
                             { label: 'Father\'s Name', value: candidateData?.applicant_form_data?.father_hushband_name || "_______" },
                             { label: 'Place of Posting', value: candidateData?.annexure_eleven_form_data?.place_of_posting || "_____" },
                         ].map((item, index) => (
@@ -494,7 +494,7 @@ const JoiningReportForm = ({ candidateData, setEditApplicant }) => {
                                     <TableCell sx={{ border: '1px solid #000' }}>{candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_org_name || ""}</TableCell>
                                     <TableCell sx={{ border: '1px solid #000' }}>{candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_designation || ""}</TableCell>
                                     <TableCell sx={{ border: '1px solid #000' }}>{candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_name || ""} , {candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_designation || ""} , {candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_email || ""} , {candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_reporting_mng_mobile_no || ""} </TableCell>
-                                    <TableCell sx={{ border: '1px solid #000' }}>{candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_from || ""} to {candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_to || ""}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #000' }}> {formatDate(candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_from) || ""} to {formatDate(candidateData?.annexure_eleven_form_data?.previous_organization_details?.previous_to) || ""}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -542,7 +542,7 @@ const JoiningReportForm = ({ candidateData, setEditApplicant }) => {
                                     Date
                                 </Typography>
                                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                    {moment().format('DD/MM/YYYY')}
+                                    {formatDate(new Date())}
                                 </Typography>
                             </Paper>
                         </Grid>

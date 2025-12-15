@@ -464,7 +464,6 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                 toast.error(response.data?.message)
             }
         } catch (error) {
-            console.log(error, 'Error while Fetching Template');
             toast.error(error?.response.data?.message || error.message || "Internal server Error")
         } finally {
             setLoading(false)
@@ -514,7 +513,7 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
 
         let rowsHtml = '';
 
-        if(salaryData.isEmpanelledOrConsultant) return '';
+        if (salaryData.isEmpanelledOrConsultant) return '';
 
         const addRow = (component, value, suffix = '') => {
             if (value > 0) {
@@ -776,7 +775,7 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
         // Open the preview page in a new tab
         window.open('/preview-letter', '_blank');
     }
-    
+
     const approvedEmailAnotherView = modalData?.modal_data?.appointment_letter_verification_status?.status === 'Complete' || modalData?.modal_data?.document_status?.status === 'approved'
     const progressData = modalData?.modal_data?.progress_data;
 
@@ -814,7 +813,7 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                         <div className="flex gap-2">
 
                             {
-                                !approvedEmailAnotherView && (
+                                !approvedEmailAnotherView && !approvedEmailAnotherView && modalData?.modal_title !== "Joining Intimation" && (
                                     <Button
                                         variant="outlined"
                                         sx={{
@@ -854,7 +853,7 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                             }
 
                             {
-                                modalData && modalData?.modal_title && (
+                                !approvedEmailAnotherView && modalData?.modal_title !== "Joining Intimation" && modalData && modalData?.modal_title && (
                                     <Button
                                         variant="outlined"
                                         size="small"
@@ -1041,7 +1040,7 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                     }
 
                     {
-                        !approvedEmailAnotherView && (
+                        !approvedEmailAnotherView && modalData?.modal_title !== "Joining Intimation" && (
                             <Box mt={10}>
                                 {mendetoryDocument.length > 0 && (
                                     <Box mb={2}>

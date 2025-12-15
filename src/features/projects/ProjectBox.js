@@ -3,6 +3,7 @@ import { IoLocationOutline, IoSettingsOutline } from "react-icons/io5";
 import { Link } from 'react-router-dom';
 import Dropdown from "react-bootstrap/Dropdown";
 import BudgetModal from "./BudgetModal";
+import ViewDetailsModal from "./ViewDetailsModal";
 import ExtendDurationModal from "./ExtendDurationModal";
 import { truncateWithEllipsis } from '../../utils/common';
 import config from '../../config/config';
@@ -18,7 +19,7 @@ import SendMprProject from './SendMprModal';
 const ProjectBox = (props) => {
 
     const itemData = props.data;
-
+    const [modalShowView, setModalShowView] = useState(false);
     const [modalShow, setModalShow] = useState(false);
     const [modalShowOne, setModalShowOne] = useState(false);
     const [openSendMpr, setOpenSetMpr] = useState(false);
@@ -154,6 +155,11 @@ const ProjectBox = (props) => {
                                         <span>MPR List</span>
                                     </div>
                                 </Dropdown.Item>
+                                <Dropdown.Item>
+                                    <div className="d-flex flex-row">
+                                        <span onClick={() => setModalShowView(true)}>View Details</span>
+                                    </div>
+                                </Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <span className={itemData.status === 'Active' ? 'text-success' : 'text-danger dangerTextClose'}>
@@ -183,6 +189,7 @@ const ProjectBox = (props) => {
             <BudgetModal show={modalShow} id={itemData._id} onHide={() => setModalShow(false)} />
             <ExtendDurationModal show={modalShowOne} id={itemData._id} onHide={() => setModalShowOne(false)} />
             <SendMprProject open={openSendMpr} setOpenClosed={setOpenSetMpr} Data={openSendMprData} loadingFetch={loading} />
+            <ViewDetailsModal show={modalShowView} id={itemData._id} onHide={() => setModalShowView(false)} />
         </>
     );
 };

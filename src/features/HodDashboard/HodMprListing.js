@@ -68,7 +68,7 @@ const ListManpowerRequisitionHod = () => {
                 "mpr_ids": selectedRows,
                 "status": bulkApprovalStatus,
                 "remark": bulkApprovalFeedback,
-                "designation":userDetails?.designation
+                "designation": userDetails?.designation
             };
 
             let respose = await axios.post(`${config.API_URL}BulkApprovedMprByCeoOrHodSir`, payload, apiHeaderToken(config.API_TOKEN));

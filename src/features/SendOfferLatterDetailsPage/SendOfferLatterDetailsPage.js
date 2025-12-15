@@ -93,70 +93,77 @@ const actionConfig = {
         buttonHover: 'rgba(198, 40, 40, 0.12)',
         icon: ContactPhoneIcon, // suitable icon for reference checks
         iconColor: 'error'
-    }
+    },
+    joiningIntimationMail: {
+        title: "Joining Intimation",
+        bgColor: '#1565c0',
+        buttonBg: 'rgba(21, 101, 192, 0.08)',
+        buttonHover: 'rgba(21, 101, 192, 0.12)',
+        icon: MailOutlineIcon,
+        iconColor: 'primary'
+    },
 };
 
 const ActionButton = ({ type, onClick, candidate }) => {
     const config = actionConfig[type];
     const Icon = config.icon;
+
     let title = config.title;
-    const appointmentLetterStatus = candidate?.document_status?.appointment_letter;
-    const joiningKitStatus = candidate?.document_status?.joining_kit;
-    const offerLatter = candidate?.document_status?.offer_letter;
-    let buttonDisabled = appointmentLetterStatus === 'generated' && (joiningKitStatus === 'mailsent' || joiningKitStatus === 'Skipped') && (offerLatter === 'mailsent' || offerLatter === 'Skipped');
-    if (appointmentLetterStatus === 'pending' && (joiningKitStatus === 'mailsent' || joiningKitStatus === 'Skipped') && (offerLatter === 'mailsent' || offerLatter === 'Skipped')) {
-        title = "Generate Appointmentd Letter";
-    } else if (appointmentLetterStatus === 'generated' && (joiningKitStatus === 'mailsent' || joiningKitStatus === 'Skipped') && (offerLatter === 'mailsent' || offerLatter === 'Skipped') && (!candidate?.appointment_letter_verification_status?.status || candidate?.appointment_letter_verification_status?.status === 'Pending')) {
-        title = "Appointment Letter Approval Pending";
-    } else if (appointmentLetterStatus === 'generated' && (joiningKitStatus === 'mailsent' || joiningKitStatus === 'Skipped') && (offerLatter === 'mailsent' || offerLatter === 'Skipped') && candidate?.appointment_letter_verification_status?.status === 'Reject') {
-        title = "Appointment Letter Rejected";
+    let buttonDisabled = false;
+
+
+    if (type === 'appointment') {
+        const appointmentLetterStatus = candidate?.document_status?.appointment_letter;
+        const joiningKitStatus = candidate?.document_status?.joining_kit;
+        const offerLatter = candidate?.document_status?.offer_letter;
+
+        buttonDisabled =
+            appointmentLetterStatus === 'generated' &&
+            (joiningKitStatus === 'mailsent' || joiningKitStatus === 'Skipped') &&
+            (offerLatter === 'mailsent' || offerLatter === 'Skipped');
+
+        if (
+            appointmentLetterStatus === 'pending' &&
+            (joiningKitStatus === 'mailsent' || joiningKitStatus === 'Skipped') &&
+            (offerLatter === 'mailsent' || offerLatter === 'Skipped')
+        ) {
+            title = "Generate Appointment Letter";
+        } else if (
+            appointmentLetterStatus === 'generated' &&
+            (!candidate?.appointment_letter_verification_status?.status ||
+                candidate?.appointment_letter_verification_status?.status === 'Pending')
+        ) {
+            title = "Appointment Letter Approval Pending";
+        } else if (
+            appointmentLetterStatus === 'generated' &&
+            candidate?.appointment_letter_verification_status?.status === 'Reject'
+        ) {
+            title = "Appointment Letter Rejected";
+        }
     }
 
     return (
-
-        buttonDisabled ? (
-            <Tooltip
-                title={title}
-                arrow
-                placement="top"
-                componentsProps={getTooltipStyle(config.bgColor)}
-                disableInteractive={false}
+        <Tooltip
+            title={title}
+            arrow
+            placement="top"
+            componentsProps={getTooltipStyle(config.bgColor)}
+        >
+            <IconButton
+                size="small"
+                sx={{
+                    backgroundColor: config.buttonBg,
+                    '&:hover': { backgroundColor: config.buttonHover }
+                }}
+                onClick={() => onClick(config.title, candidate)}
+                disabled={buttonDisabled}
             >
-                <IconButton
-                    size="small"
-                    sx={{
-                        backgroundColor: config.buttonBg,
-                        '&:hover': { backgroundColor: config.buttonHover }
-                    }}
-                    // onClick={() => onClick(config.title, candidate)}
-                    // disabled={buttonDisabled}
-                >
-                    <Icon fontSize="small" color={config.iconColor} />
-                </IconButton>
-            </Tooltip>
-        ) : (
-            <Tooltip
-                title={title}
-                arrow
-                placement="top"
-                componentsProps={getTooltipStyle(config.bgColor)}
-                disableInteractive={false}
-            >
-                <IconButton
-                    size="small"
-                    sx={{
-                        backgroundColor: config.buttonBg,
-                        '&:hover': { backgroundColor: config.buttonHover }
-                    }}
-                    onClick={() => onClick(config.title, candidate)}
-                    disabled={buttonDisabled}
-                >
-                    <Icon fontSize="small" color={config.iconColor} />
-                </IconButton>
-            </Tooltip>
-        )
+                <Icon fontSize="small" color={config.iconColor} />
+            </IconButton>
+        </Tooltip>
     );
 };
+
 
 const SendOfferLatterForApprovalCandidate = () => {
     const [approval, setApprovalData] = useState(null);
@@ -459,6 +466,11 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                 gap: 1
                                                                             }}
                                                                         >
+                                                                            <ActionButton
+                                                                                type="joiningIntimationMail"
+                                                                                onClick={showSendOfferAndJoining}
+                                                                                candidate={candidate}
+                                                                            />
                                                                             {/* Case 1: Show Offer Button if no reference check exists */}
                                                                             {Array.isArray(candidate?.reference_check) &&
                                                                                 candidate.reference_check.length === 0 &&
@@ -492,7 +504,7 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                             {(candidate?.reference_check || (candidate?.verification_skip_data?.some(r => r.referenceStatus === 'previous'))) &&
                                                                                 (Array.isArray(candidate?.reference_check) || (candidate?.verification_skip_data?.some(r => r.referenceStatus === 'previous'))) &&
                                                                                 (candidate?.reference_check?.some((item) => item?.referenceStatus === 'previous') || (candidate?.verification_skip_data?.some(r => r.referenceStatus === 'previous'))) &&
-                                                                                ["mailsent", 'uploaded' , 'Skipped'].includes(candidate.document_status?.offer_letter) &&
+                                                                                ["mailsent", 'uploaded', 'Skipped'].includes(candidate.document_status?.offer_letter) &&
                                                                                 candidate.document_status?.joining_kit === "pending" && (
                                                                                     <ActionButton
                                                                                         type="joining"
@@ -504,7 +516,7 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                             {(candidate?.reference_check || (candidate?.verification_skip_data?.some(r => ['previous', 'current'].includes(r.referenceStatus)))) &&
                                                                                 (Array.isArray(candidate?.reference_check) || (candidate?.verification_skip_data?.some(r => ['previous', 'current'].includes(r.referenceStatus)))) &&
                                                                                 (candidate?.reference_check?.some((item) => item?.referenceStatus === 'previous') || (candidate?.is_verification_skipped && candidate?.is_verification_skipped === 'Yes')) &&
-                                                                                ["mailsent", 'uploaded' , 'Skipped'].includes(candidate.document_status?.joining_kit) &&
+                                                                                ["mailsent", 'uploaded', 'Skipped'].includes(candidate.document_status?.joining_kit) &&
                                                                                 (candidate.document_status?.appointment_letter === "pending" || candidate.document_status?.appointment_letter === "generated" || candidate.document_status?.appointment_letter === "approved") && (
                                                                                     <ActionButton
                                                                                         type="appointment"
@@ -550,15 +562,15 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                 )}
                                                                             {candidate?.reference_check &&
                                                                                 Array.isArray(candidate?.reference_check) &&
-                                                                                ["mailsent", "complete", 'uploaded' , 'Skipped'].includes(candidate.document_status?.offer_letter) &&
-                                                                                ["mailsent", "complete", 'uploaded' , 'Skipped'].includes(candidate.document_status?.joining_kit) &&
+                                                                                ["mailsent", "complete", 'uploaded', 'Skipped'].includes(candidate.document_status?.offer_letter) &&
+                                                                                ["mailsent", "complete", 'uploaded', 'Skipped'].includes(candidate.document_status?.joining_kit) &&
                                                                                 ["mailsent", "complete", 'uploaded'].includes(candidate.document_status?.appointment_letter) && (
                                                                                     <Button
                                                                                         variant="outlined"
                                                                                         color="success"
                                                                                         size="small"
                                                                                         onClick={() => handleNavigate(candidate)}
-                                                                                        // disabled
+                                                                                    // disabled
                                                                                     >
                                                                                         <span style={{
                                                                                             fontSize: '0.7rem', textTransform: 'none',

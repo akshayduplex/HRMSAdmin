@@ -131,7 +131,7 @@ const ListManpowerRequisitionCeo = () => {
                                 onClear={() => setSearch('')}
                             />
                         </div> */}
-                        
+
 
                         <div className='d-flex justify-content-center align-item-center gap-2'>
                             {getParams.get('type') === 'PendingByCeo' && (
@@ -156,7 +156,7 @@ const ListManpowerRequisitionCeo = () => {
                                 />
                             </div>
                         </div>
-                        
+
                     </div>
                     <div className='row'>
                         <RequisitionTableCeo searchParamsInput={searchParams} setSelectedRows={setSelectedRows} />

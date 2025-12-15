@@ -240,7 +240,7 @@ const changeJobTypeLabel = (data) => {
 }
 
 const CustomChangesJobType = (data) => {
-    if(!data){
+    if (!data) {
         return data
     }
 
@@ -344,51 +344,59 @@ const validateTheJobPortal = (str) => {
 };
 
 function numberToWords(num) {
-  if (num === 0) return "Zero";
+    if (num === 0) return "Zero";
 
-  const belowTwenty = [
-    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
-    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
-    "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
-  ];
+    const belowTwenty = [
+        "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+        "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
+        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+    ];
 
-  const tens = [
-    "", "", "Twenty", "Thirty", "Forty", "Fifty",
-    "Sixty", "Seventy", "Eighty", "Ninety"
-  ];
+    const tens = [
+        "", "", "Twenty", "Thirty", "Forty", "Fifty",
+        "Sixty", "Seventy", "Eighty", "Ninety"
+    ];
 
-  const thousands = ["", "Thousand", "Million", "Billion"];
+    const thousands = ["", "Thousand", "Million", "Billion"];
 
-  function helper(n) {
-    let word = "";
+    function helper(n) {
+        let word = "";
 
-    if (n < 20) {
-      word = belowTwenty[n];
-    } else if (n < 100) {
-      word = tens[Math.floor(n / 10)] + " " + belowTwenty[n % 10];
-    } else if (n < 1000) {
-      word = belowTwenty[Math.floor(n / 100)] + " Hundred " + helper(n % 100);
+        if (n < 20) {
+            word = belowTwenty[n];
+        } else if (n < 100) {
+            word = tens[Math.floor(n / 10)] + " " + belowTwenty[n % 10];
+        } else if (n < 1000) {
+            word = belowTwenty[Math.floor(n / 100)] + " Hundred " + helper(n % 100);
+        }
+        return word.trim();
     }
-    return word.trim();
-  }
 
-  let i = 0;
-  let result = "";
+    let i = 0;
+    let result = "";
 
-  while (num > 0) {
-    if (num % 1000 !== 0) {
-      result = helper(num % 1000) + " " + thousands[i] + " " + result;
+    while (num > 0) {
+        if (num % 1000 !== 0) {
+            result = helper(num % 1000) + " " + thousands[i] + " " + result;
+        }
+        num = Math.floor(num / 1000);
+        i++;
     }
-    num = Math.floor(num / 1000);
-    i++;
-  }
 
-  return result.trim();
+    return result.trim();
 }
 
 
+const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = d.toLocaleString("en-US", { month: "long" });
+    const year = d.getFullYear();
+    return `${day} ${month}, ${year}`;
+};
 
 
 
 
-export { getHumanReadableDate, truncateWithEllipsis, CamelCases, DateFormate, TimeSchedule, DaysDiff, HourDiff, TimeZone, dayDiff, getRemainingWorkingDays, calculateTenure, isJobExpired, changeJobTypeLabel, addDaysAndFormatDate, getDatesInRange, formatDateToWeekOf, validateTheJobPortal , CustomChangesJobType , numberToWords }
+export { getHumanReadableDate, truncateWithEllipsis, CamelCases, DateFormate, TimeSchedule, DaysDiff, HourDiff, TimeZone, dayDiff, getRemainingWorkingDays, calculateTenure, isJobExpired, changeJobTypeLabel, addDaysAndFormatDate, getDatesInRange, formatDateToWeekOf, validateTheJobPortal, CustomChangesJobType, numberToWords, formatDate }

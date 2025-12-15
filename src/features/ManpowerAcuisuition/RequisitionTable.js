@@ -13,7 +13,7 @@ import { FaEye } from 'react-icons/fa';
 import Slide from '@mui/material/Slide';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from '@mui/material';
 import axios from 'axios';
-import { apiHeaderToken } from '../../config/api_header';
+import { apiHeaderToken, apiHeaderTokenMultiPart } from '../../config/api_header';
 import { toast } from 'react-toastify';
 import { GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import ReSendMprProject from './ReSendModalMPR';
@@ -28,6 +28,7 @@ import DownloadIcon from '@mui/icons-material/FileDownload';
 import { changeJobTypeLabel } from '../../utils/common';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import EmployeeReplacementModal from './EmpReplacementModal';
+import LocationEditModal from './EditLocation';
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -65,11 +66,11 @@ export default function RequisitionTable({ filterRecords }) {
     const [total, setTotalRecords] = useState(0);
     const [openReplaceModal, setOpenReplaceModal] = useState(false);
     const [selectModalData, setSelectedModalData] = useState(false);
-
+    const [locationEditOpen, setLocationEditOpen] = useState(false);
+    const [currentMprData, setCurrentMprData] = useState(null);
     const loginUserDetails = useMemo(() => {
         return JSON.parse(localStorage.getItem('admin_role_user')) || {}
     }, [])
-
     const [filterModel, setFilterModel] = useState({
         items: [],
     });
@@ -84,7 +85,50 @@ export default function RequisitionTable({ filterRecords }) {
             setOpenReplaceModal(true);
         }
     }
+    const handleSaveLocation = async (updatedData) => {
+        try {
+            const payload = {
+                _id: updatedData._id,
+                place_of_posting: updatedData.place_of_posting
+            };
 
+            const response = await axios.post(
+                `${config.API_URL}editRequisitionData`,
+                payload,
+                apiHeaderTokenMultiPart(config.API_TOKEN)
+            );
+
+            if (response.status === 200) {
+                toast.success('Posting locations updated successfully');
+
+                const Payloads = {
+                    keyword: "",
+                    page_no: paginationModel.page + 1,
+                    per_page_record: paginationModel.pageSize,
+                    scope_fields: [],
+                    filter_keyword: filterModel?.quickFilterValues?.join(" ").toLowerCase(),
+                    project_name: searchParams.get('project_name') || '',
+                    project_id: searchParams.get('project_id') || '',
+                };
+
+                // add status ONLY if required
+                if (searchParams.get('type') === 'pending') {
+                    Payloads.status = 'Pending';
+                }
+
+                dispatch(ManPowerAcquisitionsSlice(Payloads));
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to update locations');
+        }
+    };
+
+
+    // Update the handleOpenLocationEdit function
+    const handleOpenLocationEdit = (data) => {
+        setCurrentMprData(data);
+        setLocationEditOpen(true);
+    };
     const handleFilterModelChange = (newFilterModel) => {
         setFilterModel(newFilterModel);
     };
@@ -404,11 +448,7 @@ export default function RequisitionTable({ filterRecords }) {
                 // Separate non-CEOs and CEOs
                 const nonCEOs = passData.activity_data.filter(item => item?.designation !== 'CEO' && item?.type !== 'raised');
                 const ceos = passData.activity_data.filter(item => item?.designation === 'CEO');
-                const sortedData = [...nonCEOs, ...ceos];
-
-                console.log(sortedData , 'this is sorted data')
-
-                return sortedData.map((item, newIndex) => `
+                const sortedData = [...nonCEOs, ...ceos]; return sortedData.map((item, newIndex) => `
                             <div class="signature-box" style="width: 100%; text-align: ${newIndex % 2 === 0 ? 'start' : 'end'}; margin-bottom: 10px;">
                                 <div style="
                                     width: 80px; 
@@ -535,8 +575,8 @@ export default function RequisitionTable({ filterRecords }) {
                     comment_2: "Matching the skill sets we required. Considering for CEO round",
                 },
                 value: key,
-                dateofRequest: key?.raised_on && moment.utc(key.raised_on).isValid() 
-                    ? moment.utc(key.raised_on).format('DD/MM/YYYY') 
+                dateofRequest: key?.raised_on && moment.utc(key.raised_on).isValid()
+                    ? moment.utc(key.raised_on).format('DD/MM/YYYY')
                     : moment.utc().format('DD/MM/YYYY'),
                 designation: key?.designation_name,
                 type: changeTypeOfOpening(key?.type_of_opening),
@@ -728,14 +768,14 @@ export default function RequisitionTable({ filterRecords }) {
         {
             field: 'Action',
             headerName: 'Action',
-            width: 140,
+            width: 180,
             renderCell: (params) => {
                 const status = params.row?.value?.status;
 
                 return (
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gridTemplateColumns: 'repeat(4, 1fr)',
                         gap: '6px',
                         padding: '4px',
                         width: '100%',
@@ -852,7 +892,27 @@ export default function RequisitionTable({ filterRecords }) {
                                 </IconButton>
                             </Tooltip>
                         )}
-
+                        {['Active', 'Pending'].includes(status) && (
+                            <Tooltip title="Edit Location" arrow placement="bottom" componentsProps={{ tooltip: getTooltipStyle('#7b1fa2') }}>
+                                <IconButton
+                                    onClick={() => handleOpenLocationEdit(params.row?.value)}
+                                    size="small"
+                                    sx={{
+                                        ...commonIconButtonStyle,
+                                        backgroundColor: 'rgba(123, 31, 162, 0.08)', // purple shade
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(123, 31, 162, 0.12)',
+                                            boxShadow: '0 4px 8px rgba(123, 31, 162, 0.25)',
+                                        }
+                                    }}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" fill="none" stroke="#7b1fa2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                                    </svg>
+                                </IconButton>
+                            </Tooltip>
+                        )}
                         {/* Delete Button */}
                         {['Pending'].includes(status) && (
                             <Tooltip
@@ -1201,6 +1261,13 @@ export default function RequisitionTable({ filterRecords }) {
                     <button className='danderBtb' onClick={handleDeleteRequisition}>Agree</button>
                 </DialogActions>
             </Dialog>
+            {/* Edit Location Modal */}
+            <LocationEditModal
+                open={locationEditOpen}
+                setOpen={setLocationEditOpen}
+                currentMprData={currentMprData}
+                onSave={handleSaveLocation}
+            />
             {/* Re-send Modal */}
             <ReSendMprProject open={reSendOpen} setOpenClosed={setReSendOpen} Data={projectDetails} mprDocId={mprDocId} setProjectDetials={setProjectDetials} loadingToFetch={fetchRecordLoading} />
             {/* alert Diolods Alert Site ---- */}
