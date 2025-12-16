@@ -179,15 +179,23 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
     const [skipLoading, setSkipLoading] = useState(false)
     const [selectedDocIds, setSelectedDocIds] = useState([]); // Store selected document IDs
     const [isInitialized, setIsInitialized] = useState(false); // Track if state is initialized
+
     const handleClose = useCallback(() => {
         setOpen(false)
         setFile(null)
         setFiles([])
         setDescription('')
+        if (modalData?.modal_title === "Joining Intimation") {
+            setEmailSubject('')
+            setFilterInterview(null)
+            setSelectedDocIds([])
+            setOptionalDoc([])
+            setMendetoryDoc([])
+        }
         if (resetRef.current) {
             resetRef.current.value = null;
         }
-    }, [setOpen]);
+    }, [setOpen, modalData?.modal_title]);
 
     const SkipReference = async (e) => {
         e.preventDefault();
@@ -352,23 +360,53 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
 
     useEffect(() => {
         const approvedEmailAnotherView = modalData?.modal_data?.appointment_letter_verification_status?.status === 'Complete' || modalData?.modal_data?.document_status?.status === 'approved'
+
+        // Skip saved template loading for "Joining Intimation"
+        if (modalData?.modal_title === "Joining Intimation") {
+            setDescription('');
+            setTemplateData(null);
+            return;
+        }
+
         if (open && modalData?.modal_data?._id && id && approvedEmailAnotherView) {
             getSavedTemplate()
         }
     }, [open])
 
     useEffect(() => {
-
         const approvedEmailAnotherView = modalData?.modal_data?.appointment_letter_verification_status?.status === 'Complete' || modalData?.modal_data?.document_status?.status === 'approved'
 
-
-        if (open && modalData?.modal_data?._id && id && !approvedEmailAnotherView) {
-
-            getTemplateList()
-
+        // Skip template loading for "Joining Intimation"
+        if (modalData?.modal_title === "Joining Intimation") {
+            setDescription('');
+            setTemplateData(null);
+            setMendetoryDoc([]);
+            setOptionalDoc([]);
+            setSelectedDocIds([]);
+            return;
         }
 
+        if (open && modalData?.modal_data?._id && id && !approvedEmailAnotherView) {
+            getTemplateList()
+        }
     }, [open, modalData, getTemplateList, id])
+
+    const resetJoiningIntimationState = useCallback(() => {
+        if (modalData?.modal_title === "Joining Intimation") {
+            setDescription('');
+            setTemplateData(null);
+            setMendetoryDoc([]);
+            setOptionalDoc([]);
+            setSelectedDocIds([]);
+            setEmailSubject('');
+        }
+    }, [modalData?.modal_title]);
+
+    useEffect(() => {
+        if (open && modalData?.modal_title === "Joining Intimation") {
+            resetJoiningIntimationState();
+        }
+    }, [open, modalData?.modal_title, resetJoiningIntimationState]);
 
     const handleSend = async (event) => {
         event.preventDefault()
@@ -1279,16 +1317,17 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                                     onClick={handleSend}
                                     disabled={loading}
                                 >
-                                    {(modalData?.modal_data?.appointment_letter_verification_status?.status === 'Pending' && modalData?.modal_title === "Appointment Letter") ? 'Generate' : loading ? (
-                                        <CircularProgress
-                                            size={24}
-                                            sx={{
-                                                color: 'white',
-                                            }}
-                                        />
-                                    ) : (
-                                        'Send'
-                                    )}
+                                    {modalData?.modal_title === "Joining Intimation" ? 'Send' : // Always show "Send" for Joining Intimation
+                                        (modalData?.modal_data?.appointment_letter_verification_status?.status === 'Pending' && modalData?.modal_title === "Appointment Letter") ? 'Generate' : loading ? (
+                                            <CircularProgress
+                                                size={24}
+                                                sx={{
+                                                    color: 'white',
+                                                }}
+                                            />
+                                        ) : (
+                                            'Send'
+                                        )}
                                 </Button>
                             </div>
                         ) : (
@@ -1296,23 +1335,18 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                                 className="d-flex align-items-end justify-content-end"
                                 style={{ gap: "10px" }}
                             >
-                                {modalData && modalData?.modal_title !== "Appointment Letter" && roleUserDetails?.special_permissions?.reference_check_skip === "yes" && (
-                                    <Button
-                                        onClick={SkipReference}
-                                        variant="outlined"
-                                        color="primary"
-                                    >
-                                        {skipLoading ? <CircularProgress size={24} /> : "Skip"}
-                                    </Button>
-                                )}
-
-                                {/* <Button
-                                    onClick={SkipReference}
-                                    variant="outlined"
-                                    color="primary"
-                                >
-                                    Skip
-                                </Button> */}
+                                {/* Conditionally show Skip button - not for Joining Intimation */}
+                                {modalData && modalData?.modal_title !== "Appointment Letter" &&
+                                    modalData?.modal_title !== "Joining Intimation" &&
+                                    roleUserDetails?.special_permissions?.reference_check_skip === "yes" && (
+                                        <Button
+                                            onClick={SkipReference}
+                                            variant="outlined"
+                                            color="primary"
+                                        >
+                                            {skipLoading ? <CircularProgress size={24} /> : "Skip"}
+                                        </Button>
+                                    )}
 
                                 <Button
                                     variant="contained"
@@ -1327,14 +1361,14 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                                     onClick={handleSend}
                                     disabled={loading}
                                 >
-                                    {modalData?.modal_data?.appointment_letter_verification_status?.status ===
-                                        "Pending" ? (
-                                        "Generate"
-                                    ) : loading ? (
-                                        <CircularProgress size={24} sx={{ color: "white" }} />
-                                    ) : (
-                                        "Send"
-                                    )}
+                                    {modalData?.modal_title === "Joining Intimation" ? 'Send' : // Always show "Send" for Joining Intimation
+                                        modalData?.modal_data?.appointment_letter_verification_status?.status === "Pending" ? (
+                                            "Generate"
+                                        ) : loading ? (
+                                            <CircularProgress size={24} sx={{ color: "white" }} />
+                                        ) : (
+                                            "Send"
+                                        )}
                                 </Button>
                             </div>
                         )

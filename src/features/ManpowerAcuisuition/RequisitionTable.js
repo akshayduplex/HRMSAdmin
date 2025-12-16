@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import { GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import ReSendMprProject from './ReSendModalMPR';
 import AlertDialogSlide from './CeoConfirmatioModal';
+import RoomIcon from '@mui/icons-material/Room';
 import {
     IconButton
 } from '@mui/material';
@@ -76,7 +77,6 @@ export default function RequisitionTable({ filterRecords }) {
     });
 
     const handleOpenReplaceApprovalMemberModal = async (data) => {
-        // let response = await dispatch(ManPowerAcquisitionsSlice(Payloads)).unwrap()
         let payloads = { "_id": data?._id }
         let response = await dispatch(ManPowerAcquisitionsSingleRecords(payloads)).unwrap()
 
@@ -88,19 +88,17 @@ export default function RequisitionTable({ filterRecords }) {
     const handleSaveLocation = async (updatedData) => {
         try {
             const payload = {
-                _id: updatedData._id,
-                place_of_posting: updatedData.place_of_posting
+                requisition_id: updatedData?._id,
+                place_of_posting: updatedData?.place_of_posting
             };
 
-            const response = await axios.post(
-                `${config.API_URL}editRequisitionData`,
+            const response = await axios.put(
+                `${config.API_URL}update-place-of-posting`,
                 payload,
-                apiHeaderTokenMultiPart(config.API_TOKEN)
+                apiHeaderToken(config.API_TOKEN)
             );
 
             if (response.status === 200) {
-                toast.success('Posting locations updated successfully');
-
                 const Payloads = {
                     keyword: "",
                     page_no: paginationModel.page + 1,
@@ -111,18 +109,20 @@ export default function RequisitionTable({ filterRecords }) {
                     project_id: searchParams.get('project_id') || '',
                 };
 
-                // add status ONLY if required
                 if (searchParams.get('type') === 'pending') {
                     Payloads.status = 'Pending';
                 }
 
                 dispatch(ManPowerAcquisitionsSlice(Payloads));
+                setLocationEditOpen(false);
             }
+
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update locations');
+            toast.error(
+                error?.response?.data?.message || 'Failed to update locations'
+            );
         }
     };
-
 
     // Update the handleOpenLocationEdit function
     const handleOpenLocationEdit = (data) => {
@@ -894,23 +894,22 @@ export default function RequisitionTable({ filterRecords }) {
                         )}
                         {['Active', 'Pending'].includes(status) && (
                             <Tooltip title="Edit Location" arrow placement="bottom" componentsProps={{ tooltip: getTooltipStyle('#7b1fa2') }}>
-                                <IconButton
+                                <RoomIcon
                                     onClick={() => handleOpenLocationEdit(params.row?.value)}
-                                    size="small"
+                                    fontSize="small"
                                     sx={{
                                         ...commonIconButtonStyle,
-                                        backgroundColor: 'rgba(123, 31, 162, 0.08)', // purple shade
+                                        color: '#7b1fa2',
+                                        // borderRadius: '50%',
+                                        transition: 'all 0.25s ease',
+
                                         '&:hover': {
-                                            backgroundColor: 'rgba(123, 31, 162, 0.12)',
-                                            boxShadow: '0 4px 8px rgba(123, 31, 162, 0.25)',
+                                            backgroundColor: 'rgba(123, 31, 162, 0.12)', // soft purple bg
+                                            color: '#7b1fa2',
+                                            boxShadow: '0 4px 10px rgba(123, 31, 162, 0.35)',
                                         }
                                     }}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" fill="none" stroke="#7b1fa2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 20h9"></path>
-                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
-                                    </svg>
-                                </IconButton>
+                                />
                             </Tooltip>
                         )}
                         {/* Delete Button */}

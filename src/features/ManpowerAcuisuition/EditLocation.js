@@ -111,13 +111,14 @@ const LocationEditModal = ({
         setLoading(true);
         try {
             // Prepare the locations in the format your API expects
-            const formattedLocations = postingLocations.map((loc) => ({
-                location_name: loc.location_name || loc.label.split(',')[0].trim(),
-                location_id: loc.value,
-                state_id: loc.state_id,
-                state_name: loc.state_name || loc.label.split(',')[1]?.trim()
-            }));
-
+            const formattedLocations = postingLocations
+                .filter(loc => loc && typeof loc === 'object')
+                .map(loc => ({
+                    location_name: loc.location_name,
+                    location_id: loc.value,
+                    state_id: loc.state_id,
+                    state_name: loc.state_name
+                }));
             // Call the onSave prop with updated data
             await onSave({
                 ...currentMprData,

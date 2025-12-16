@@ -539,7 +539,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
           {/* footer on first page - WITH webSetting data */}
           <View style={pdfStyles.footer} fixed>
             <Text style={pdfStyles.companyName}>{webSettingData?.meta_title}</Text>
-            <Text style={pdfStyles.address}> <span style={{ fontWeight: 'bold' }}>Corporate Office:</span> {webSettingData?.office_address}</Text>
+            <Text style={pdfStyles.address}> <Text style={{ fontWeight: 'bold' }}>Corporate Office:</Text> {webSettingData?.office_address}</Text>
             <Text style={pdfStyles.contact}>
               Tel: {webSettingData?.organization_mobile_no} |
               {' '}
@@ -577,7 +577,7 @@ const AppointmentLetterCommon = ({ templateDescription, webSettingData, previewD
         {remainingContent.length > 0 && (
           (() => {
             const pages = [];
-            const itemsPerPage = 30;
+            const itemsPerPage = 25;
 
             for (let i = 0; i < remainingContent.length; i += itemsPerPage) {
               const pageContent = remainingContent.slice(i, i + itemsPerPage);
