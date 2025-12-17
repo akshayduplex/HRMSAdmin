@@ -135,7 +135,7 @@ export default function Onboarding() {
     const savedData = localStorage.getItem("employeeFormData");
     return savedData ? JSON.parse(savedData) : {};
   });
-  
+
   const [educationData, setEducationData] = useState([
     { degree: "High School", year: "", marks: "" },
     { degree: "Intermediate", year: "", marks: "" },
@@ -210,7 +210,7 @@ export default function Onboarding() {
   }, [dispatch, searchParams])
 
   const dateOfBirthFormate = (dateString) => {
-    console.log(`${dateString?.year}-${dateString?.month}-${dateString?.date}` , 'this is date');
+    console.log(`${dateString?.year}-${dateString?.month}-${dateString?.date}`, 'this is date');
     let actialDateFormate = moment(`${dateString?.year}-${dateString?.month}-0${dateString?.date}`).format('YYYY-MM-DD');
     return actialDateFormate;
   };
@@ -261,14 +261,14 @@ export default function Onboarding() {
       };
       setClfFormData(clfData);
       /************ AutoFill the Experience and Education */
-      let educatetionFielads = 
-      data?.education?.length > 0 ? data?.education :
-      data?.applicant_form_data?.qualification?.length > 0 ?
-      data?.applicant_form_data?.qualification?.map((edu) => ({
-        degree: edu.degree,
-        year: edu.passing_year,
-        marks: edu?.marks ? edu?.marks : 0,
-      })) : [] ;
+      let educatetionFielads =
+        data?.education?.length > 0 ? data?.education :
+          data?.applicant_form_data?.qualification?.length > 0 ?
+            data?.applicant_form_data?.qualification?.map((edu) => ({
+              degree: edu.degree,
+              year: edu.passing_year,
+              marks: edu?.marks ? edu?.marks : 0,
+            })) : [];
 
       const educationData = educatetionFielads?.map((edu, index) => ({
         id: index,
@@ -283,16 +283,16 @@ export default function Onboarding() {
         setCertifications(educationData);
       }
 
-      let expiriaceDataWithEmpORCandidate = 
-      data?.experience?.length > 0 ? data?.experience :
-      data?.applicant_form_data?.employment_history?.length > 0 ? 
-      data?.applicant_form_data?.employment_history?.map((exp) => ({
-        company: exp?.org_name,
-        designation: exp?.designation,
-        from_date: formatDate(exp.duration_from),
-        to_date: formatDate(exp.duration_to),
-      }))
-      : [] ;
+      let expiriaceDataWithEmpORCandidate =
+        data?.experience?.length > 0 ? data?.experience :
+          data?.applicant_form_data?.employment_history?.length > 0 ?
+            data?.applicant_form_data?.employment_history?.map((exp) => ({
+              company: exp?.org_name,
+              designation: exp?.designation,
+              from_date: formatDate(exp.duration_from),
+              to_date: formatDate(exp.duration_to),
+            }))
+            : [];
       // Format and set prefile fields
       const formattedPrefileFields = expiriaceDataWithEmpORCandidate?.map((field) => ({
         employer_name: field?.company,
@@ -449,7 +449,7 @@ export default function Onboarding() {
 
   useEffect(() => {
     const myId = localStorage.getItem("onBoardingId");
-    if(myId){
+    if (myId) {
       fetchCandidateData();
     }
   }, []);
@@ -851,7 +851,7 @@ export default function Onboarding() {
       division: value,
     }));
   };
-  
+
   const handleDivisionOptionClick = (division) => {
     setClfFormData((prevData) => ({
       ...prevData,
@@ -1193,13 +1193,13 @@ export default function Onboarding() {
 
       if (response.status) {
 
-          localStorage.setItem("onBoardingId", response.data);
-          toast.success(response.message);
-          if(searchParams.get('approval_note_id') && searchParams.get('candidate_id')){
-            navigate(`/salary?candidate_id=${searchParams.get('candidate_id')}&approval_note_id=${searchParams.get('approval_note_id')}`);
-          }else{
-            navigate(`/salary`);
-          }
+        localStorage.setItem("onBoardingId", response.data);
+        toast.success(response.message);
+        if (searchParams.get('approval_note_id') && searchParams.get('candidate_id')) {
+          navigate(`/salary?candidate_id=${searchParams.get('candidate_id')}&approval_note_id=${searchParams.get('approval_note_id')}`);
+        } else {
+          navigate(`/salary`);
+        }
 
       } else {
         toast.error(response.message);
@@ -1398,7 +1398,7 @@ export default function Onboarding() {
     return () => {
       localStorage.removeItem("PfInfoFormData");
     }
-  } , [])
+  }, [])
 
   const [openOnBoardDoc, setOpenOnboardDoc] = useState(false);
 
@@ -1468,140 +1468,9 @@ export default function Onboarding() {
                       data-aos-duration="3000"
                     >
                       <div className="col-5">
-                        {/* <Form>
-                          <Form.Group className="mb-4" controlId="highSchool">
-                            <Form.Label>
-                              High School Percentage & Passing Year
-                            </Form.Label>
-                            <div className="d-flex flex-row gap-5">
-                              <Form.Control
-                                type="hidden"
-                                name="degree"
-                                value={educationData[0]?.degree || ''}
-                              />
-                              <Form.Control
-                                type="text"
-                                placeholder="90"
-                                value={educationData[0]?.marks || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 0, "marks")
-                                }
-                                maxLength={5}
-                              />
-                              <Form.Control
-                                type="text"
-                                maxLength={4}
-                                placeholder="2000"
-                                value={educationData[0]?.year || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 0, "year")
-                                }
-                                pattern="\d{4}"
-                              />
-                            </div>
-                          </Form.Group>
-                          <Form.Group className="mt-1" controlId="graduation">
-                            <Form.Label>
-                              Graduation Percentage & Passing Year
-                            </Form.Label>
-                            <div className="d-flex flex-row gap-5">
-                              <Form.Control
-                                type="hidden"
-                                name="degree"
-                                value={educationData[2]?.degree || ''}
-                              />
-                              <Form.Control
-                                type="text"
-                                placeholder="80"
-                                value={educationData[2]?.marks || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 2, "marks")
-                                }
-                                maxLength={5}
-                              />
-                              <Form.Control
-                                type="text"
-                                maxLength={4}
-                                placeholder="2005"
-                                value={educationData[2]?.year || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 2, "year")
-                                }
-                                pattern="\d{4}"
-                              />
-                            </div>
-                          </Form.Group>
-                        </Form> */}
+
                       </div>
-                      {/* <div className="col-5">
-                        <Form>
-                          <Form.Group className="mb-4" controlId="intermediate">
-                            <Form.Label>
-                              Intermediate Percentage & Passing Year
-                            </Form.Label>
-                            <div className="d-flex flex-row gap-5">
-                              <Form.Control
-                                type="hidden"
-                                name="degree"
-                                value={educationData[1]?.degree || ''}
-                              />
-                              <Form.Control
-                                type="text"
-                                placeholder="98"
-                                value={educationData[1]?.marks || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 1, "marks")
-                                }
-                                maxLength={5}
-                              />
-                              <Form.Control
-                                type="text"
-                                maxLength={4}
-                                placeholder="2002"
-                                value={educationData[1]?.year || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 1, "year")
-                                }
-                                pattern="\d{4}"
-                              />
-                            </div>
-                          </Form.Group>
-                          <Form.Group
-                            className="mt-1"
-                            controlId="postGraduation"
-                          >
-                            <Form.Label>
-                              Post Graduation Percentage & Passing Year
-                            </Form.Label>
-                            <div className="d-flex flex-row gap-5">
-                              <Form.Control
-                                type="hidden"
-                                name="degree"
-                                value={educationData[3]?.degree || ''}
-                              />
-                              <Form.Control
-                                type="text"
-                                placeholder="N/A"
-                                value={educationData[3]?.marks || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 3, "marks")
-                                }
-                                maxLength={5}
-                              />
-                              <Form.Control
-                                type="text"
-                                maxLength={4}
-                                placeholder="N/A"
-                                value={educationData[3]?.year || ''}
-                                onChange={(e) =>
-                                  handleEducationInputChange(e, 3, "year")
-                                }
-                                pattern="\d{4}"
-                              />
-                            </div>
-                          </Form.Group>
-                        </Form>
-                      </div> */}
+
                     </div>
 
                     {/* Certification Information */}
@@ -1819,16 +1688,6 @@ export default function Onboarding() {
                             </button>
                           }
 
-                          {/* <button
-                            className="subtbtn"
-                            disabled={index === 0 ? true : false}
-                            type="button"
-                            onClick={() =>
-                              ExphandleRemoveFileField(preffile.id)
-                            }
-                          >
-                            -
-                          </button> */}
                         </div>
                       ))}
                       <button
@@ -1926,15 +1785,15 @@ export default function Onboarding() {
                                 value={
                                   // For candidate data (editing existing)
                                   clfFormData?.isBrachUpdateFromCandidate && clfFormData?.branch?.[0]
-                                    ? availableOptionsMap.get(clfFormData?.branch[0]) ? [availableOptionsMap.get(clfFormData?.branch[0])] : [{label: clfFormData?.branch[0], value: clfFormData?.branch[0]}]
+                                    ? availableOptionsMap.get(clfFormData?.branch[0]) ? [availableOptionsMap.get(clfFormData?.branch[0])] : [{ label: clfFormData?.branch[0], value: clfFormData?.branch[0] }]
                                     : // For user-selected options (current state) - remove duplicates
                                     Array.isArray(clfFormData?.branch) && clfFormData?.branch?.length > 0
                                       ? [...new Set(clfFormData.branch)].map((branch) =>
-                                          availableOptionsMap.get(branch) || {label: branch, value: branch}
-                                        )
+                                        availableOptionsMap.get(branch) || { label: branch, value: branch }
+                                      )
                                       : // For existing employee data (editing saved employee)
                                       clfFormData?.branch && !Array.isArray(clfFormData?.branch)
-                                        ? availableOptionsMap.get(clfFormData?.branch) || {label: clfFormData?.branch, value: clfFormData?.branch}
+                                        ? availableOptionsMap.get(clfFormData?.branch) || { label: clfFormData?.branch, value: clfFormData?.branch }
                                         : // Default: no selection
                                         null
                                 }
@@ -1949,27 +1808,7 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>Occupation</Form.Label>
-                            {/* <Form.Control
-                              type="text"
-                              name="occupation"
-                              value={clfFormData.occupation}
-                              onChange={handleOccupationChange}
-                              placeholder="Search for a occupation..."
-                            />
-                            {occupationOptions.length > 0 && (
-                              <ul className="suggest-dropdown position-absolute">
-                                {occupationOptions.map((option) => (
-                                  <li
-                                    key={option._id}
-                                    onClick={() =>
-                                      handleOccupationOptionClick(option.name)
-                                    }
-                                  >
-                                    {option.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            )} */}
+
                             <Select
                               name="occupation"
                               value={occuptionOptin}
@@ -1987,27 +1826,6 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>Department</Form.Label>
-                            {/* <Form.Control
-                              type="text"
-                              name="department"
-                              value={clfFormData.department}
-                              onChange={handleDepartmentChange}
-                              placeholder="Search for a department..."
-                            />
-                            {departmentsOptions.length > 0 && (
-                              <ul className="suggest-dropdown position-absolute">
-                                {departmentsOptions.map((option) => (
-                                  <li
-                                    key={option._id}
-                                    onClick={() =>
-                                      handleDepartmentOptionClick(option.name)
-                                    }
-                                  >
-                                    {option.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            )} */}
 
 
                             {/* Department DropDown for test Data */}
@@ -2046,27 +1864,7 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>Region</Form.Label>
-                            {/* <Form.Control
-                              type="text"
-                              name="region"
-                              value={clfFormData.region}
-                              onChange={handleRegionListChange}
-                              placeholder="Search for a region..."
-                            />
-                            {regionListOptions.length > 0 && (
-                              <ul className="suggest-dropdown position-absolute">
-                                {regionListOptions.map((option) => (
-                                  <li
-                                    key={option._id}
-                                    onClick={() =>
-                                      handleRegionListOptionClick(option.name)
-                                    }
-                                  >
-                                    {option.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            )} */}
+
                             <Select
                               name="region"
                               value={resionStateOption}
@@ -2240,17 +2038,7 @@ export default function Onboarding() {
                           >
                             <Form.Label>Bank Branch</Form.Label>
                             <div className="d-flex flex-row gap-5 text-start">
-                              {/* <Form.Select
-                                defaultValue="Choose..."
-                                name="bank_branch"
-                                value={
-                                  PfInfoFormData.bank_branch || "Choose..."
-                                }
-                                onChange={PfInfohandleInputChange}
-                              >
-                                <option value="Lucknow">Lucknow</option>
-                                <option value="Kanpur">Kanpur</option>
-                              </Form.Select> */}
+
                               <Form.Control
                                 type="text"
                                 placeholder="Kapoorthala, Lucknow "
@@ -2316,28 +2104,7 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>Bank Name</Form.Label>
-                            {/* <Form.Control
-                              type="text"
-                              name="bank_name"
-                              value={PfInfoFormData.bank_name}
-                              onChange={handleBankListChange}
-                              placeholder="Search for a bank name..."
-                            />
-                            {bankListOptions.length > 0 && (
-                              <ul className="suggest-dropdown position-absolute">
-                                {bankListOptions.map((option) => (
-                                  <li
-                                    key={option._id}
-                                    onClick={() =>
-                                      handleBankListOptionClick(option.name)
-                                    }
-                                  >
-                                    {option.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            )} */}
-                            {/* handle the Bank Name Details  */}
+
                             <Select
                               name="bank_name"
                               value={bankSelectOption}
@@ -2456,27 +2223,7 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>City / District</Form.Label>
-                            {/* <Form.Control
-                              type="text"
-                              name="city_district"
-                              value={residenceFormData.city_district || ""}
-                              onChange={handleResidenceChange}
-                              placeholder="Search for a city / district..."
-                            />
-                            {residenceListOptions.length > 0 && (
-                              <ul className="suggest-dropdown position-absolute">
-                                {residenceListOptions.map((option) => (
-                                  <li
-                                    key={option._id}
-                                    onClick={() =>
-                                      handleresidenceOptionClick(option.name)
-                                    }
-                                  >
-                                    {option.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            )} */}
+
                             <Select
                               name="Search for a city / district"
                               value={district}
@@ -2494,18 +2241,7 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>State</Form.Label>
-                            {/* <Form.Select
-                              name="state_name"
-                              value={residenceFormData.state_name || ""}
-                              onChange={addresshandleInputChange}
-                            >
-                              <option value="">Choose...</option>
-                              {stateList.map((state) => (
-                                <option key={state.id} value={state.name}>
-                                  {state.name}
-                                </option>
-                              ))}
-                            </Form.Select> */}
+
                             <Select
                               name="Search for a city / district"
                               value={state_name}
@@ -2598,28 +2334,7 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>City / District</Form.Label>
-                            {/* <Form.Control
-                              type="text"
-                              name="city_district"
-                              value={permanentFormData.city_district || ""}
-                              onChange={handlePermanentChange}
-                              placeholder="Search for a city / district..."
-                              disabled={isSameAddress}
-                            />
-                            {permanentListOptions.length > 0 && (
-                              <ul className="suggest-dropdown position-absolute">
-                                {permanentListOptions.map((option) => (
-                                  <li
-                                    key={option._id}
-                                    onClick={() =>
-                                      handlepermanentOptionClick(option.name)
-                                    }
-                                  >
-                                    {option.name}
-                                  </li>
-                                ))}
-                              </ul>
-                            )} */}
+
 
                             <Select
                               name="Search for a city / district"
@@ -2639,22 +2354,6 @@ export default function Onboarding() {
                             controlId="exampleForm.ControlInput13"
                           >
                             <Form.Label>State</Form.Label>
-
-                            {/* <Form.Select
-                              name="state_name"
-                              value={permanentFormData.state_name || ""}
-                              onChange={permanenthandleInputChange}
-                              disabled={isSameAddress} // Disable if checkbox is checked
-                            >
-                              <option value="">Choose...</option>
-                              {stateList.map((state) => (
-                                <option key={state.value} value={state.label}>
-                                  {state.label}
-                                </option>
-                              ))}
-                            </Form.Select> */}
-
-
 
                             <Select
                               name="Search for a city / district"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Form from "react-bootstrap/Form";
 import { CiCalendar } from "react-icons/ci";
-import { getProjectList } from "./helper/Api_Helper";
+import { getDesignationList, getProjectList } from "./helper/Api_Helper";
 import AsyncSelect from 'react-select/async';
 import { useDispatch } from "react-redux";
 import FormControl from "@mui/material/FormControl";
@@ -44,6 +44,70 @@ export default function General_info({ formData, handleInputChange, designationD
   const [projectList, setProjectList] = useState([]);
   const [DesignationValue, setDesignationValue] = useState([]);
   const [filteredOptions, setFilteredOptions] = useState([]);
+  const [designationOptions, setDesignationOptions] = useState([]);
+  const [designationPage, setDesignationPage] = useState(1);
+  const [hasMoreDesignation, setHasMoreDesignation] = useState(true);
+  const [designationSearch, setDesignationSearch] = useState("");
+  const [loadingDesignation, setLoadingDesignation] = useState(false);
+  useEffect(() => {
+    loadDesignation("", 1, true);
+  }, []);
+
+  const loadDesignation = async (searchKey, page, reset = false) => {
+    if (loadingDesignation || (!hasMoreDesignation && !reset)) return;
+
+    setLoadingDesignation(true);
+
+    const response = await getDesignationList(searchKey, page);
+    const list = response?.data || [];
+
+    const mapped = list.map(item => ({
+      label: item.name,
+      value: item._id,
+    }));
+
+    setDesignationOptions(prev =>
+      reset ? mapped : [...prev, ...mapped]
+    );
+
+    setHasMoreDesignation(list.length === 25);
+    setDesignationPage(page);
+    setLoadingDesignation(false);
+  };
+  const handleDesignationInputChange = (inputValue) => {
+    setDesignationSearch(inputValue);
+    setDesignationPage(1);
+    setHasMoreDesignation(true);
+    loadDesignation(inputValue, 1, true);
+  };
+  const handleDesignationScroll = () => {
+    if (hasMoreDesignation) {
+      loadDesignation(designationSearch, designationPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    fetchDesignation();
+  }, []);
+
+  const fetchDesignation = async () => {
+    const response = await getDesignationList("");
+    if (response?.data?.length > 0) {
+      const options = response.data.map((item) => ({
+        label: item.name,
+        value: item._id
+      }));
+      setDesignationOptions(options);
+    }
+  };
+
+  const loadDesignationOptions = async (inputValue) => {
+    const response = await getDesignationList(inputValue);
+    return response?.data?.map((item) => ({
+      label: item.name,
+      value: item._id
+    })) || [];
+  };
 
 
   useEffect(() => {
@@ -269,26 +333,36 @@ export default function General_info({ formData, handleInputChange, designationD
               </Form.Group>
 
 
-              <Form.Group
-                className="mb-4 col-6"
-                controlId="exampleForm.ControlInput13"
-              >
+              <Form.Group className="mb-4 col-6">
                 <Form.Label>Designation</Form.Label>
-                <div className="d-flex flex-row gap-5 text-start">
-                  <FormControl fullWidth>
-                    <Select
-                      name="designation"
-                      value={DesignationValue}
-                      onChange={handleDesignationChange}
-                      options={filteredOptions}
-                      onMenuOpen={onMenuOpen}
-                      // onInputChange={handleDesignationInputChange}
-                      isSearchable={true} // Enable search functionality
-                      placeholder="Choose Designation"
-                      styles={customStyles}
-                    />
-                  </FormControl>
-                </div>
+                <FormControl fullWidth>
+                  <AsyncSelect
+                    cacheOptions={false}
+                    isLoading={loadingDesignation}
+                    defaultOptions={designationOptions}
+                    options={designationOptions}
+                    value={DesignationValue}
+                    onChange={(option) => {
+                      setDesignationValue(option);
+                      handleInputChange({
+                        target: {
+                          name: "designation",
+                          value: option?.label || "",
+                        },
+                      });
+                      handleInputChange({
+                        target: {
+                          name: "designation_id",
+                          value: option?.value || "",
+                        },
+                      });
+                    }}
+                    onInputChange={handleDesignationInputChange}
+                    onMenuScrollToBottom={handleDesignationScroll}
+                    placeholder="Choose Designation"
+                    styles={customStyles}
+                  />
+                </FormControl>
               </Form.Group>
 
               <Form.Group className="mb-4 col-6" controlId="valid_till">
@@ -356,7 +430,7 @@ export default function General_info({ formData, handleInputChange, designationD
                 <div className="d-flex flex-row gap-5">
                   <Form.Control
                     type="email"
-                    placeholder="xxx@gmail.com"
+                    placeholder="abc@gmail.com"
                     name="email"
                     value={formData.email || ""}
                     onChange={handleInputChange}
@@ -368,20 +442,20 @@ export default function General_info({ formData, handleInputChange, designationD
                 <div className="d-flex flex-row gap-5">
                   <Form.Control
                     type="text"
-                    placeholder="xxxx@gmail.com"
+                    placeholder="abc@gmail.com"
                     name="alt_email"
                     value={formData.alt_email || ""}
                     onChange={handleInputChange}
-                    // onChange={(e) => {
-                    //   const value = e.target.value;
-                    //   const filteredValue = value.replace(/[^0-9]/g, "").slice(0, 10);
-                    //   handleInputChange({
-                    //     target: {
-                    //       name: "alt_email",
-                    //       value: filteredValue
-                    //     }
-                    //   });
-                    // }}
+                  // onChange={(e) => {
+                  //   const value = e.target.value;
+                  //   const filteredValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+                  //   handleInputChange({
+                  //     target: {
+                  //       name: "alt_email",
+                  //       value: filteredValue
+                  //     }
+                  //   });
+                  // }}
                   />
                 </div>
               </Form.Group>
@@ -396,14 +470,14 @@ export default function General_info({ formData, handleInputChange, designationD
                     value={formData.mobile_no || ""}
                     // onChange={handleInputChange}
                     onChange={(e) => {
-                        let value = e.target.value;
-                        const filteredValue = value.replace(/[^0-9]/g, "").slice(0, 10);
-                        handleInputChange({
-                          target: {
-                            name: "mobile_no",
-                            value: filteredValue
-                          }
-                        });
+                      let value = e.target.value;
+                      const filteredValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+                      handleInputChange({
+                        target: {
+                          name: "mobile_no",
+                          value: filteredValue
+                        }
+                      });
                     }}
                   />
                 </div>

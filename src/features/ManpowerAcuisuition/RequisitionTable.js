@@ -892,7 +892,7 @@ export default function RequisitionTable({ filterRecords }) {
                                 </IconButton>
                             </Tooltip>
                         )}
-                        {['Active', 'Pending'].includes(status) && (
+                        {['Active', 'Pending', 'Approved'].includes(status) && (
                             <Tooltip title="Edit Location" arrow placement="bottom" componentsProps={{ tooltip: getTooltipStyle('#7b1fa2') }}>
                                 <RoomIcon
                                     onClick={() => handleOpenLocationEdit(params.row?.value)}
@@ -902,7 +902,9 @@ export default function RequisitionTable({ filterRecords }) {
                                         color: '#7b1fa2',
                                         // borderRadius: '50%',
                                         transition: 'all 0.25s ease',
-
+                                        backgroundColor: 'rgba(123, 31, 162, 0.08)',
+                                        boxShadow: '0 2px 4px rgba(123, 31, 162, 0.15)',
+                                        padding: '6px',
                                         '&:hover': {
                                             backgroundColor: 'rgba(123, 31, 162, 0.12)', // soft purple bg
                                             color: '#7b1fa2',

@@ -76,8 +76,8 @@
     "yup": "^1.6.1"
   },
   "scripts": {
-    "start": "cross-env NODE_OPTIONS=--max_old_space_size=4096 craco --openssl-legacy-provider start",
-    "build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 craco --openssl-legacy-provider build",
+    "start": "cross-env NODE_OPTIONS=--max_old_space_size=8129 craco --openssl-legacy-provider start",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8129 craco --openssl-legacy-provider build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },

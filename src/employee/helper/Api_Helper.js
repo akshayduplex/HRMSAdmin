@@ -48,13 +48,13 @@ const getLocationList = async (searchKey) => {
   }
 };
 
-const getDesignationList = async (searchKey) => {
+const getDesignationList = async (searchKey, pageNo = 1) => {
   try {
     const response = await axios.post(
       `${APIURL}getDesignationList`,
       {
         keyword: searchKey,
-        page_no: "1",
+        page_no: pageNo,
         per_page_record: "25",
         scope_fields: ["_id", "name"],
         status: "Active",
@@ -63,10 +63,10 @@ const getDesignationList = async (searchKey) => {
     );
     return response.data;
   } catch (error) {
-    // console.error('Error fetching location list', error);
     return handleError(error);
   }
 };
+
 
 const getOccupationList = async (searchKey) => {
   try {
@@ -248,7 +248,7 @@ const getAppliedFromList = async (searchKey) => {
   }
 };
 //
-const getEmployeeAllList = async (searchKey, searchQuery, type , projectList , id) => {
+const getEmployeeAllList = async (searchKey, searchQuery, type, projectList, id) => {
   try {
     const response = await axios.post(
       `${APIURL}getEmployeeAllList`,
@@ -256,12 +256,12 @@ const getEmployeeAllList = async (searchKey, searchQuery, type , projectList , i
         keyword: searchQuery,
         page_no: "1",
         per_page_record: "999999",
-        scope_fields: ["employee_code" , "name" , "email" , 'mobile_no' , 'alt_mobile_no' , 'joining_date' , 'project_name' , 'branch', 'designation' , 'department' , 'employee_type' , 'batch_id' , 'profile_status' , 'add_date'],
+        scope_fields: ["employee_code", "name", "email", 'mobile_no', 'alt_mobile_no', 'joining_date', 'project_name', 'branch', 'designation', 'department', 'employee_type', 'batch_id', 'profile_status', 'add_date'],
         status: searchKey,
-        type : type,
-        project_id:projectList?.value ? projectList?.value : id ? id : '',
-        project_name:projectList?.label,
-        "is_count":"yes"
+        type: type,
+        project_id: projectList?.value ? projectList?.value : id ? id : '',
+        project_name: projectList?.label,
+        "is_count": "yes"
       },
       apiHeaderToken()
     );
@@ -272,8 +272,8 @@ const getEmployeeAllList = async (searchKey, searchQuery, type , projectList , i
   }
 };
 
-const getEmployeeRecordsForFilter = async (searchKey, searchQuery, type , projectList , id) => {
-    try {
+const getEmployeeRecordsForFilter = async (searchKey, searchQuery, type, projectList, id) => {
+  try {
     const response = await axios.post(
       `${APIURL}getEmployeeAllList`,
       {
@@ -282,9 +282,9 @@ const getEmployeeRecordsForFilter = async (searchKey, searchQuery, type , projec
         per_page_record: "999999",
         scope_fields: [],
         status: searchKey,
-        type : type,
-        project_id:projectList?.value ? projectList?.value : id ? id : '',
-        project_name:projectList?.label 
+        type: type,
+        project_id: projectList?.value ? projectList?.value : id ? id : '',
+        project_name: projectList?.label
       },
       apiHeaderToken()
     );
@@ -295,11 +295,11 @@ const getEmployeeRecordsForFilter = async (searchKey, searchQuery, type , projec
   }
 }
 
-const addEmployeeGeneralInfo = async (postData , jon_id , candidate_id) => {
+const addEmployeeGeneralInfo = async (postData, jon_id, candidate_id) => {
   try {
 
     let Payloads = {
-      job_id:jon_id,
+      job_id: jon_id,
       candidate_id,
       ...postData
     }
@@ -427,7 +427,7 @@ const getProjectList = async (inputValue) => {
       `${APIURL}getProjectList`,
       {
         project_id: inputValue ? inputValue : '',
-        status:'Active'
+        status: 'Active'
       },
       apiHeaderToken()
     );
@@ -461,9 +461,9 @@ const getProjectBudgetChart = async (payload) => {
       `${APIURL}getProjectBudgetChart`,
       {
         keyword: '',
-        project_id : payload.project_id,
-        from_date : payload.from_date,
-        to_date : payload.to_date,
+        project_id: payload.project_id,
+        from_date: payload.from_date,
+        to_date: payload.to_date,
         scope_fields: ["_id", "docs", "name", "photo"],
       },
       apiHeaderToken()
@@ -475,13 +475,13 @@ const getProjectBudgetChart = async (payload) => {
   }
 };
 
-const getProjectWiseVacancyChart = async (project_id , employeeType) => {
+const getProjectWiseVacancyChart = async (project_id, employeeType) => {
   try {
     const response = await axios.post(
       `${APIURL}getProjectWiseVacancyChart`,
       {
         project_id: project_id,
-        employee_type:employeeType
+        employee_type: employeeType
       },
       apiHeaderToken()
     );

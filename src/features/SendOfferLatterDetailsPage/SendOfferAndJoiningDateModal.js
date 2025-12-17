@@ -409,102 +409,134 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
     }, [open, modalData?.modal_title, resetJoiningIntimationState]);
 
     const handleSend = async (event) => {
-        event.preventDefault()
+        event.preventDefault();
         try {
+            setLoading(true);
 
-            let formData = new FormData()
-            // Use the already-processed description (which includes salary table and additional benefits from useEffect)
-            const finalDescription = description;
+            const loginUsers = JSON.parse(localStorage.getItem('admin_role_user')) ?? {};
+            const approved = modalData?.modal_data?.appointment_letter_verification_status?.status === 'Complete' ||
+                modalData?.modal_data?.document_status?.status === 'approved';
 
-            let approved = modalData?.modal_data?.appointment_letter_verification_status?.status === 'Complete' || modalData?.modal_data?.document_status?.status === 'approved'
-
+            let url = '';
             let payload = {};
+            let isMultipart = false;
+            let headers = apiHeaderToken(config.API_TOKEN);
 
-            if (approved) {
+            // Dedicated flow for Joining Intimation
+            if (modalData?.modal_title === "Joining Intimation") {
+                url = `${config.API_URL}send_joining_intimation_mail`;
+
                 payload = {
-                    "candidate_doc_id": modalData?.modal_data?.cand_doc_id,
-                    "approval_note_doc_id": modalData?.approval_note_doc_id,
-                    "email_subject": emailSubject,
-                    "add_by_name": loginUsers?.name,
-                    "add_by_mobile": loginUsers?.mobile_no,
-                    "add_by_designation": loginUsers?.designation,
-                    "add_by_email": loginUsers?.email,
-                    "selected_doc": JSON.stringify(selectedDocIds)
+                    candidate_doc_id: modalData?.modal_data?.cand_doc_id,
+                    approval_note_doc_id: id,
+                    email_subject: emailSubject || "Joining Intimation Letter",
+                    content: description, // may be empty or used if backend expects it
+                    add_by_name: loginUsers?.name,
+                    add_by_designation: loginUsers?.designation,
+                    add_by_mobile: loginUsers?.mobile_no,
+                    add_by_email: loginUsers?.email,
+                    selected_doc: selectedDocIds.length > 0 ? JSON.stringify(selectedDocIds) : null
+                };
+            }
+            // Approved Appointment Letter (after verification/approval)
+            else if (approved) {
+                url = `${config.API_URL}sendAppointmentLetterToCandidateAfterApproval`;
+
+                payload = {
+                    candidate_doc_id: modalData?.modal_data?.cand_doc_id,
+                    approval_note_doc_id: modalData?.approval_note_doc_id || id,
+                    email_subject: emailSubject,
+                    add_by_name: loginUsers?.name,
+                    add_by_mobile: loginUsers?.mobile_no,
+                    add_by_designation: loginUsers?.designation,
+                    add_by_email: loginUsers?.email,
+                    selected_doc: selectedDocIds.length > 0 ? JSON.stringify(selectedDocIds) : null
+                };
+            }
+            // Non-approved flow: Appointment Letter generation or other mails (Offer Letter, etc.)
+            else {
+                url = `${config.API_URL}send_approval_mail`;
+                const formData = new FormData();
+
+                const finalDescription = modalData?.modal_title === "Appointment Letter" ? description : description;
+
+                formData.append("contents", finalDescription);
+                formData.append("approval_note_id", id);
+                formData.append("template_id", templateData?.template_id || '');
+                formData.append("email_subject", emailSubject);
+                formData.append("candidate_id", modalData?.modal_data?.cand_doc_id);
+                formData.append("add_by_name", loginUsers?.name);
+                formData.append("add_by_mobile", loginUsers?.mobile_no);
+                formData.append("add_by_designation", loginUsers?.designation);
+                formData.append("add_by_email", loginUsers?.email);
+
+                if (selectedDocIds.length > 0) {
+                    formData.append("selected_doc", JSON.stringify(selectedDocIds));
                 }
-                // formData.append("candidate_doc_id", modalData?.modal_data?.cand_doc_id)
-                // formData.append("approval_note_doc_id", modalData?.approval_note_doc_id)
-                // formData.append("add_by_name", loginUsers?.name)
-                // formData.append("add_by_mobile", loginUsers?.mobile_no)
-                // formData.append("add_by_designation", loginUsers?.designation)
-                // formData.append("add_by_email", loginUsers?.email)
-            } else {
-                formData.append("contents", modalData && modalData?.modal_title === "Appointment Letter" ? finalDescription : description)
-                formData.append("approval_note_id", id)
-                formData.append("template_id", templateData?.template_id)
-                if (selectedDocIds.length > 0) formData.append("selected_doc", JSON.stringify(selectedDocIds))
-                formData.append("email_subject", emailSubject)
-                formData.append("candidate_id", modalData?.modal_data?.cand_doc_id)
-                formData.append("add_by_name", loginUsers?.name)
-                formData.append("add_by_mobile", loginUsers?.mobile_no)
-                formData.append("add_by_designation", loginUsers?.designation)
-                formData.append("add_by_email", loginUsers?.email)
-                if (totalSalaryBreakup) formData.append('salary_structure', JSON.stringify(totalSalaryBreakup))
+
+                if (totalSalaryBreakup) {
+                    formData.append('salary_structure', JSON.stringify(totalSalaryBreakup));
+                }
+
                 if (filterInterview) {
-                    formData.append("trail_mail_list", JSON.stringify(filterInterview?.map((item) => {
-                        return {
-                            email: item?.email,
-                            name: item?.name,
-                        }
-                    })))
-                }
-                let attachments = [];
-
-                if (files && Array.isArray(files)) {
-                    attachments = files.map((input) => ({
-                        doc_name: input.name,
-                        file_name: input
-                    }));
+                    formData.append("trail_mail_list", JSON.stringify(filterInterview.map(item => ({
+                        email: item?.email,
+                        name: item?.name,
+                    }))));
                 }
 
+                // Handle attachments (uploaded replacements + new files)
+                let attachmentIndex = 0;
+
+                // if (files && Array.isArray(files)) {
+                //     attachments = files.map((input) => ({
+                //         doc_name: input.name,
+                //         file_name: input
+                //     }));
+                // }
                 if (file && typeof file === 'object') {
-                    Object.entries(file).forEach(([docIdx, filesArr]) => {
-                        filesArr.forEach((input, i) => {
-                            attachments.push({
-                                doc_name: input.name,
-                                file_name: input
-                            })
+                    Object.values(file).forEach(filesArr => {
+                        filesArr.forEach(inputFile => {
+                            formData.append(`attachments[${attachmentIndex}][doc_name]`, inputFile.name);
+                            formData.append(`attachments[${attachmentIndex}][file_name]`, inputFile);
+                            attachmentIndex++;
                         });
                     });
                 }
 
-                attachments.forEach((att, i) => {
-                    formData.append(`attachments[${i}][doc_name]`, att.doc_name);
-                    formData.append(`attachments[${i}][file_name]`, att.file_name);
-                });
+                // Newly uploaded files (not tied to existing docs)
+                if (files && files.length > 0) {
+                    files.forEach(inputFile => {
+                        formData.append(`attachments[${attachmentIndex}][doc_name]`, inputFile.name);
+                        formData.append(`attachments[${attachmentIndex}][file_name]`, inputFile);
+                        attachmentIndex++;
+                    });
+                }
+
+                payload = formData;
+                isMultipart = true;
+                headers = apiHeaderTokenMultiPart(config.API_TOKEN);
             }
 
-            setLoading(true)
-
-            // sendAppointmentLetterToCandidateAfterApproval
-
-            let response = await axios.post(`${config.API_URL}${approved ? 'sendAppointmentLetterToCandidateAfterApproval' : 'send_approval_mail'}`, approved ? payload : formData, approved ? apiHeaderToken(config.API_TOKEN) : apiHeaderTokenMultiPart(config.API_TOKEN))
+            const response = await axios.post(url, payload, headers);
 
             if (response.status === 200) {
-                toast.success(response.data?.message)
+                toast.success(response.data?.message || "Mail sent successfully!");
                 fetchAgainApprovalDetails();
                 handleClose();
-                setFilterInterview(null)
-                setSelectedDocIds([])
-                setOptionalDoc([])
-                setMendetoryDoc([])
-                setEmailSubject('')
+                setFilterInterview(null);
+                setSelectedDocIds([]);
+                setOptionalDoc([]);
+                setMendetoryDoc([]);
+                setEmailSubject('');
             } else {
-                toast.error(response.data?.message)
+                toast.error(response.data?.message || "Failed to send mail");
             }
         } catch (error) {
-            toast.error(error?.response.data?.message || error.message || "Internal server Error")
+            console.error("Error in handleSend:", error);
+            toast.error(error?.response?.data?.message || error.message || "Internal server error");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
