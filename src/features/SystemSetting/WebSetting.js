@@ -17,9 +17,10 @@ const WebSetting = ({ settingData, fetchCandidateDetails }) => {
     const [title, setTitle] = useState('');
     const [metaTitle, setMetaTitle] = useState('');
     const [metaDescription, setMetaDescription] = useState('');
-    const [webSiteLink , setWebsiteLink] = useState('');
-    const [jonPortalLink , setJonPortalLink] = useState('');
+    const [webSiteLink, setWebsiteLink] = useState('');
+    const [jonPortalLink, setJonPortalLink] = useState('');
     const [loading, setLoading] = useState(false);
+    const [wantHrms, setWantHrms] = useState(false);
 
     useEffect(() => {
 
@@ -29,6 +30,7 @@ const WebSetting = ({ settingData, fetchCandidateDetails }) => {
             setMetaDescription(settingData?.meta_description)
             setWebsiteLink(settingData?.website_link)
             setJonPortalLink(settingData?.job_portal_link)
+            setWantHrms(settingData?.want_hrms || false);
         }
 
     }, [settingData])
@@ -65,7 +67,7 @@ const WebSetting = ({ settingData, fetchCandidateDetails }) => {
         },
         maxFiles: 1,
     });
-    
+
     const onDropWaterMark = (acceptedFiles) => {
         const file = acceptedFiles[0];
         setWaterMarkFile(file);
@@ -109,6 +111,8 @@ const WebSetting = ({ settingData, fetchCandidateDetails }) => {
         formData.append('water_mark_file', waterMarkFile);
         formData.append('website_link', webSiteLink);
         formData.append('job_portal_link', jonPortalLink);
+        formData.append('want_hrms', wantHrms);
+
 
         setLoading(true)
 
@@ -195,7 +199,7 @@ const WebSetting = ({ settingData, fetchCandidateDetails }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        
+
                         <Col md={6}>
                             <Form.Group controlId="meta-description">
                                 <Form.Label>Job Portal Link</Form.Label>
@@ -339,6 +343,19 @@ const WebSetting = ({ settingData, fetchCandidateDetails }) => {
                                 )}
                             </Form.Group>
                         </Col>
+                        <Row className="mt-3">
+                            <Col md={6}>
+                                <Form.Group controlId="want-hrms">
+                                    <Form.Check
+                                        type="checkbox"
+                                        label="Enable HRMS"
+                                        checked={wantHrms}
+                                        onChange={(e) => setWantHrms(e.target.checked)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
                         {/* <Col md={6}>
                             <Form.Group controlId="web-logo">
                                 <Form.Label>Favicon Icon</Form.Label>
