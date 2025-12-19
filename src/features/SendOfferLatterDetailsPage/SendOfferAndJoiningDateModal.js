@@ -40,43 +40,6 @@ import "react-quill/dist/quill.snow.css";
 import moment from 'moment';
 import { numberToWords } from '../../utils/common';
 
-// Using ReactQuill for rich text editing (already in project and working)
-
-
-// const customStyles = {
-//     control: (provided, state) => ({
-//         ...provided,
-//         backgroundColor: "#fff !important",
-//         borderColor: state.isFocused
-//             ? "#D2C9FF"
-//             : state.isHovered
-//                 ? "#80CBC4"
-//                 : provided.borderColor,
-//         boxShadow: state.isFocused ? "0 0 0 1px #D2C9FF" : "none",
-//         "&:hover": {
-//             borderColor: "#D2C9FF",
-//         },
-//         minHeight: "44px",
-//     }),
-//     menu: (provided) => ({
-//         ...provided,
-//         borderTop: "1px solid #D2C9FF",
-//     }),
-//     option: (provided, state) => ({
-//         ...provided,
-//         borderBottom: "1px solid #D2C9FF",
-//         color: state.isSelected ? "#fff" : "#000000",
-//         backgroundColor: state.isSelected
-//             ? "#4CAF50"
-//             : state.isFocused
-//                 ? "#80CBC4"
-//                 : provided.backgroundColor,
-//         "&:hover": {
-//             backgroundColor: "#80CBC4",
-//             color: "#fff",
-//         },
-//     }),
-// };
 const customStyles = {
     control: (provided, state) => ({
         ...provided,
@@ -1288,47 +1251,6 @@ export default function SendOfferJoiningModal({ open, setOpen, existingFileUrl, 
                                         }
                                     </Box>
                                 )}
-                                {/* Upload New File */}
-                                {/* <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                                    <Button
-                                        variant="outlined"
-                                        component="label"
-                                        startIcon={<UploadFileIcon />}
-                                        disabled={modalData?.modal_data?.appointment_letter_verification_status?.status === 'Complete' || modalData?.modal_data?.document_status?.status === 'approved'}
-                                    >
-                                        Upload New File
-                                        <input
-                                            type="file"
-                                            ref={resetRef}
-                                            hidden
-                                            onChange={handleFileUploadMultiple}
-                                        />
-                                    </Button>
-                                </Stack>
-                                {files.map((file, idx) => (
-                                    <Stack direction="row" spacing={1} alignItems="center" key={file.name + idx} sx={{ mb: 1 }}>
-                                        <Typography variant="body2" sx={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {file.name}
-                                        </Typography>
-                                        <IconButton
-                                            size="small"
-                                            color="primary"
-                                            href={URL.createObjectURL(file)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <VisibilityIcon />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                            color="error"
-                                            onClick={() => handleRemoveFile(idx)}
-                                        >
-                                            <GridDeleteIcon />
-                                        </IconButton>
-                                    </Stack>
-                                ))} */}
-                                {/* here design the salary  */}
                             </Box>
                         )}
                     {

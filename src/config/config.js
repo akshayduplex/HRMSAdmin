@@ -10,10 +10,10 @@ config['size'] = 500;
 
 //Stagging Server Config-
 config['BASE_URL'] = 'https://hrmsapis.dtsmis.in/';
-config['API_URL'] = 'https://hrmsapis.dtsmis.in/v1/admin/';
+config['API_URL'] = 'http://localhost:8080/v1/admin/';
 config['CANDIDATE_URL'] = 'https://hrmsapis.dtsmis.in/v1/candidate/';
 config['PANEL_URL'] = 'https://hrmsapis.dtsmis.in/'
-config['IMAGE_PATH'] = 'https://hrmsapis.dtsmis.in/public/uploads/';
+config['IMAGE_PATH'] = 'http://localhost:8080/public/uploads/';
 config['IMAGE_PATH_EMP'] = 'https://hrmsapis.dtsmis.in/public/emp_uploads/';
 config['GLOB_API_URL'] = 'https://hrmsapis.dtsmis.in/v1/global/';
 config['GOOGLE_MAP_KEY'] = 'AIzaSyDjkMMcPgRXYBLKaUf6finQlPubrbNbvbw';

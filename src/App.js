@@ -1,4 +1,4 @@
-import React, { useEffect , Suspense , lazy } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Provider, useDispatch } from 'react-redux';
 import AOS from 'aos';
@@ -130,6 +130,7 @@ import ApprovalTableHod from './features/HodDashboard/ApprovalNoteHod';
 import ListManpowerRequisitionHod from './features/HodDashboard/HodMprListing';
 import ListOfInterviewedCandidateOfHod from './features/HodDashboard/HodInterviewListing';
 import FeedBackOpenpage from './features/FeedbackOpen/FeedBackOpenpage';
+import TemplatePreviewPage from './features/SendOfferLatterDetailsPage/PreviewStaticOfferAndAppointment';
 const lazyLoad = lazy(() => import('./features/HodDashboard/HodInterviewListing'));
 // import DataTableComponent from './features/test/testFeatures';
 
@@ -175,7 +176,7 @@ const RequireAuthEmployee = ({ children }) => {
  */
 const HandleTokenExpiredAlert = () => {
   const location = useLocation();
-  const excludedRoutes = ["/login", "/verify-otp", "/mprFrm", "/rqForm", "/offerApprovalForm" , "/referenceCheck" , '/interviewFeedback'];
+  const excludedRoutes = ["/login", "/verify-otp", "/mprFrm", "/rqForm", "/offerApprovalForm", "/referenceCheck", '/interviewFeedback'];
 
   const isExcluded = excludedRoutes.some((route) =>
     location.pathname.includes(route)
@@ -262,8 +263,8 @@ const App = () => {
           <Route exact path="/login" element={<Login />} />
           <Route exact path='/mprFrm/:id' element={<MprFormValidation />} />
           <Route exact path='/rqForm/:id' element={<RQFormData />} />
-          <Route exact path='/interviewFeedback/:id' element={ <Suspense fallback={<div className="text-center">Loading...</div>}>
-           <FeedBackOpenpage />
+          <Route exact path='/interviewFeedback/:id' element={<Suspense fallback={<div className="text-center">Loading...</div>}>
+            <FeedBackOpenpage />
           </Suspense>} />
           <Route exact path='/offerApprovalForm/:id' element={<ApproveOfferValidation />} />
           <Route exact path='/referenceCheck/:id' element={<ReferenceCheckForm />} />
@@ -298,6 +299,7 @@ const App = () => {
               )
             }
           />
+          <Route path="/template-preview/:candidateId/:approvalId" element={<TemplatePreviewPage />} />
           <Route exact path="/candidate-listing" element={<RequireAuth><CandidateListing /></RequireAuth>} />
           <Route exact path="/candidate-joining-listing" element={<RequireAuth><JoiningCandidateList /></RequireAuth>} />
           <Route exact path="/approval-candidate-list/:id" element={<RequireAuth><SendOfferLatterForApprovalCandidate /></RequireAuth>} />
@@ -411,7 +413,7 @@ const App = () => {
           <Route exact path="*" element={<Navigate to="/dashboard" />} />
           {/* Interview Schedule and ReSchedule */}
         </Routes>
-         <HandleTokenExpiredAlert />
+        <HandleTokenExpiredAlert />
       </Router>
     </Provider>
   );

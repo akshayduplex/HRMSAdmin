@@ -1,13 +1,11 @@
-
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Row from 'react-bootstrap/Row';
-import GoBackButton from '../goBack/GoBackButton';
 import axios from 'axios';
 import config from '../../config/config';
 import { apiHeaderToken, apiHeaderTokenMultiPart } from '../../config/api_header';
 import { Button, Col, Container, Form, Nav, Spinner, Tab } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 
 import {
     Table,
@@ -39,9 +37,6 @@ import EmailApprovalCheckStatus from './EmailApprovalCheck';
 import { FaEye, FaFileDownload, FaClock } from 'react-icons/fa';
 import OfferTimelineStepper from './components/OfferTimelineStepper';
 import { Grid } from 'react-loader-spinner';
-import { useNavigate } from 'react-router-dom';
-
-
 
 // Add these helper functions/constants
 const getTooltipStyle = (bgColor) => ({
@@ -111,7 +106,6 @@ const ActionButton = ({ type, onClick, candidate }) => {
     let title = config.title;
     let buttonDisabled = false;
 
-
     if (type === 'appointment') {
         const appointmentLetterStatus = candidate?.document_status?.appointment_letter;
         const joiningKitStatus = candidate?.document_status?.joining_kit;
@@ -164,7 +158,6 @@ const ActionButton = ({ type, onClick, candidate }) => {
     );
 };
 
-
 const SendOfferLatterForApprovalCandidate = () => {
     const [approval, setApprovalData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -173,7 +166,7 @@ const SendOfferLatterForApprovalCandidate = () => {
     const [openCheckApprovedInEmail, setOpenCheckApprovedInEmail] = useState(false);
     const [CandidateData, setCandidateData] = useState({});
     const [showTimeline, setShowTimeline] = useState({});
-    const Navigate = useNavigate()
+    const navigate = useNavigate();
 
     const { id } = useParams()
     const [open, setOpen] = useState(false);
@@ -184,6 +177,26 @@ const SendOfferLatterForApprovalCandidate = () => {
         modal_data: null,
         approval_note_doc_id: null,
     })
+
+    const [webSettingData, setWebSettingData] = useState(null);
+    const getConfigData = async () => {
+        try {
+            let response = await axios.get(`${config.API_URL}getAllSettingData`, apiHeaderToken(config.API_TOKEN))
+
+            if (response.status === 200) {
+                setWebSettingData(response?.data?.data)
+            } else {
+                setWebSettingData(null)
+            }
+
+        } catch (error) {
+            setWebSettingData(null)
+        }
+    }
+
+    useEffect(() => {
+        getConfigData();
+    }, []);
 
     const RoleUserDetails = useMemo(() => {
         return JSON.parse(localStorage.getItem("admin_role_user") || {});
@@ -232,16 +245,33 @@ const SendOfferLatterForApprovalCandidate = () => {
         }
     }, [GetApprovalNodeDetailsById, id])
 
+    // Updated showSendOfferAndJoining function
     const showSendOfferAndJoining = async (title, data) => {
         if (!title) {
             return toast.warn("Something Went Wrong")
         }
-        setModalData({
-            modal_title: title,
-            modal_data: data,
-            approval_note_doc_id: id,
-        })
-        setOpen(true);
+
+        // Check if want_hrms is true, then redirect to preview page
+        if (webSettingData?.want_hrms === true) {
+            // Navigate to template preview page with appropriate parameters
+            navigate(`/template-preview/${data?.cand_doc_id}/${id}?type=${getTemplateType(title)}&job_type=${data?.job_type}`);
+        } else {
+            // Original modal behavior
+            setModalData({
+                modal_title: title,
+                modal_data: data,
+                approval_note_doc_id: id,
+            })
+            setOpen(true);
+        }
+    }
+
+    // Helper function to determine template type based on title
+    const getTemplateType = (title) => {
+        if (title.includes('Offer Letter')) return 'offer';
+        if (title.includes('Joining Kit') || title.includes('Joining Intimation')) return 'joining';
+        if (title.includes('Appointment Letter')) return 'appointment';
+        return 'offer'; // default
     }
 
     const OpenReferenceModal = (candidate_data, status) => {
@@ -271,7 +301,6 @@ const SendOfferLatterForApprovalCandidate = () => {
 
     return (
         <>
-            {/* <AllHeaders /> */}
             <div className="maincontent">
                 <div className="container hrdashboard" data-aos="fade-in" data-aos-duration="3000">
                     <div className="backbtn mt-3 mb-2">
@@ -292,6 +321,13 @@ const SendOfferLatterForApprovalCandidate = () => {
                                 <Row className="mb-3">
                                     <Col>
                                         <h5>Candidate(s) List For Approval ID {loading ? "..." : approval?.approval_note_id || ""}</h5>
+                                        {/* Show HRMS mode indicator */}
+                                        {webSettingData?.want_hrms && (
+                                            <div className="alert alert-info mb-0 mt-2 py-1 d-inline-flex align-items-center">
+                                                <FaEye className="me-2" />
+                                                <small>HRMS Mode: Clicking actions will open preview page</small>
+                                            </div>
+                                        )}
                                     </Col>
                                 </Row>
                                 <Row>
@@ -447,7 +483,6 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                                     '&:hover': { backgroundColor: '#a69cd8ff' }
                                                                                                 }}
                                                                                                 className="text-white"
-                                                                                            // to={`/referral-check-details/${candidate.cand_doc_id}`}
                                                                                             >
                                                                                                 <ContactPhoneIcon fontSize="small" size="small" color="#9c91cfff" />
                                                                                             </IconButton>
@@ -495,7 +530,6 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                 candidate.document_status?.appointment_letter === "pending" && (
                                                                                     <ActionButton
                                                                                         type="offer"
-                                                                                        // onClick={() => OpenReferenceModal(candidate)}
                                                                                         onClick={showSendOfferAndJoining}
                                                                                         candidate={candidate}
                                                                                     />
@@ -539,12 +573,12 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                                 candidate.reference_check.some(r => r.referenceStatus === 'current' && r.verification_status === 'Pending');
 
                                                                                             if (noCurrent) {
-                                                                                                // Step: open “current” modal
+                                                                                                // Step: open "current" modal
                                                                                                 return OpenReferenceModal(candidate, 'current');
                                                                                             }
 
                                                                                             if (hasCurrent && !CurrentApproved) {
-                                                                                                // Step: HR‑Head review
+                                                                                                // Step: HR-Head review
                                                                                                 return OpenReferenceApprovalModal(candidate, 'hrhead');
                                                                                             }
 
@@ -555,8 +589,6 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                             // Otherwise: skip straight to send-offer/joining
                                                                                             return showSendOfferAndJoining('Appointment Letter', candidate);
                                                                                         }}
-
-                                                                                        // onClick={showSendOfferAndJoining}
                                                                                         candidate={candidate}
                                                                                     />
                                                                                 )}
@@ -570,7 +602,6 @@ const SendOfferLatterForApprovalCandidate = () => {
                                                                                         color="success"
                                                                                         size="small"
                                                                                         onClick={() => handleNavigate(candidate)}
-                                                                                    // disabled
                                                                                     >
                                                                                         <span style={{
                                                                                             fontSize: '0.7rem', textTransform: 'none',
@@ -600,19 +631,22 @@ const SendOfferLatterForApprovalCandidate = () => {
                                             </Table>
                                         </TableContainer>
                                     </Col>
-                                    {/* <Col xs={4} md={4} lg={4}>
-                                        <OfferTimelineStepper candidateData={approval} />
-                                    </Col> */}
                                 </Row>
                             </Container>
                         </div>
                     </div>
                 </div>
             </div>
-            <SendOfferJoiningModal open={open} setOpen={setOpen} modalData={modalData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} />
-            <ReferenceCheckModal open={referenceCheckModalOpen} onClose={() => setReferenceCheckModalOpen(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
-            <EmailApprovalCheckStatus open={openCheckApprovedInEmail} onClose={() => setOpenCheckApprovedInEmail(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
-            <ReferenceCheckApprovalModal open={referechCheckApprovalModal} onClose={() => setApprovalCheckModal(false)} approvalDetails={approval && approval} candidateDetails={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} referenceStatus={referenceStatus} />
+
+            {/* Conditionally render modals only when want_hrms is false */}
+            {!webSettingData?.want_hrms && (
+                <>
+                    <SendOfferJoiningModal open={open} setOpen={setOpen} modalData={modalData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} />
+                    <ReferenceCheckModal open={referenceCheckModalOpen} onClose={() => setReferenceCheckModalOpen(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
+                    <EmailApprovalCheckStatus open={openCheckApprovedInEmail} onClose={() => setOpenCheckApprovedInEmail(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
+                    <ReferenceCheckApprovalModal open={referechCheckApprovalModal} onClose={() => setApprovalCheckModal(false)} approvalDetails={approval && approval} candidateDetails={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} referenceStatus={referenceStatus} />
+                </>
+            )}
         </>
     );
 };
