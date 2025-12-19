@@ -245,26 +245,31 @@ const SendOfferLatterForApprovalCandidate = () => {
         }
     }, [GetApprovalNodeDetailsById, id])
 
-    // Updated showSendOfferAndJoining function
+    //showSendOfferAndJoining function
     const showSendOfferAndJoining = async (title, data) => {
         if (!title) {
-            return toast.warn("Something Went Wrong")
+            return toast.warn("Something Went Wrong");
         }
 
-        // Check if want_hrms is true, then redirect to preview page
-        if (webSettingData?.want_hrms === true) {
-            // Navigate to template preview page with appropriate parameters
-            navigate(`/template-preview/${data?.cand_doc_id}/${id}?type=${getTemplateType(title)}&job_type=${data?.job_type}`);
-        } else {
-            // Original modal behavior
-            setModalData({
-                modal_title: title,
-                modal_data: data,
-                approval_note_doc_id: id,
-            })
-            setOpen(true);
+        const isJoiningIntimation = title.includes('Joining Intimation');
+        const isAppointmentLetter = title.includes('Appointment Letter');
+
+        // Apply want_hrms condition ONLY for Appointment Letter
+        if (webSettingData?.want_hrms === true && isAppointmentLetter) {
+            navigate(
+                `/template-preview/${data?.cand_doc_id}/${id}?type=${getTemplateType(title)}&job_type=${data?.job_type}`
+            );
+            return;
         }
-    }
+
+        // For all other cases (Offer, Joining Kit, Joining Intimation), use the modal
+        setModalData({
+            modal_title: title,
+            modal_data: data,
+            approval_note_doc_id: id,
+        });
+        setOpen(true);
+    };
 
     // Helper function to determine template type based on title
     const getTemplateType = (title) => {
@@ -321,13 +326,6 @@ const SendOfferLatterForApprovalCandidate = () => {
                                 <Row className="mb-3">
                                     <Col>
                                         <h5>Candidate(s) List For Approval ID {loading ? "..." : approval?.approval_note_id || ""}</h5>
-                                        {/* Show HRMS mode indicator */}
-                                        {webSettingData?.want_hrms && (
-                                            <div className="alert alert-info mb-0 mt-2 py-1 d-inline-flex align-items-center">
-                                                <FaEye className="me-2" />
-                                                <small>HRMS Mode: Clicking actions will open preview page</small>
-                                            </div>
-                                        )}
                                     </Col>
                                 </Row>
                                 <Row>
@@ -639,14 +637,27 @@ const SendOfferLatterForApprovalCandidate = () => {
             </div>
 
             {/* Conditionally render modals only when want_hrms is false */}
-            {!webSettingData?.want_hrms && (
-                <>
-                    <SendOfferJoiningModal open={open} setOpen={setOpen} modalData={modalData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} />
-                    <ReferenceCheckModal open={referenceCheckModalOpen} onClose={() => setReferenceCheckModalOpen(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
-                    <EmailApprovalCheckStatus open={openCheckApprovedInEmail} onClose={() => setOpenCheckApprovedInEmail(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
-                    <ReferenceCheckApprovalModal open={referechCheckApprovalModal} onClose={() => setApprovalCheckModal(false)} approvalDetails={approval && approval} candidateDetails={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} referenceStatus={referenceStatus} />
-                </>
-            )}
+            <>
+                {!webSettingData?.want_hrms && (
+                    <>
+                        <ReferenceCheckModal open={referenceCheckModalOpen} onClose={() => setReferenceCheckModalOpen(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
+                        <EmailApprovalCheckStatus open={openCheckApprovedInEmail} onClose={() => setOpenCheckApprovedInEmail(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
+                        <ReferenceCheckApprovalModal open={referechCheckApprovalModal} onClose={() => setApprovalCheckModal(false)} approvalDetails={approval && approval} candidateDetails={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} referenceStatus={referenceStatus} />
+                    </>
+                )}
+
+                <SendOfferJoiningModal
+                    open={open}
+                    setOpen={setOpen}
+                    modalData={modalData}
+                    fetchAgainApprovalDetails={fetchAgainApprovalDetails}
+                    roleUserDetails={userDetails}
+                />
+
+                <ReferenceCheckModal open={referenceCheckModalOpen} onClose={() => setReferenceCheckModalOpen(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
+                <EmailApprovalCheckStatus open={openCheckApprovedInEmail} onClose={() => setOpenCheckApprovedInEmail(false)} Candidate={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} referenceStatus={referenceStatus} roleUserDetails={userDetails} />
+                <ReferenceCheckApprovalModal open={referechCheckApprovalModal} onClose={() => setApprovalCheckModal(false)} approvalDetails={approval && approval} candidateDetails={CandidateData} fetchAgainApprovalDetails={fetchAgainApprovalDetails} roleUserDetails={userDetails} referenceStatus={referenceStatus} />
+            </>
         </>
     );
 };

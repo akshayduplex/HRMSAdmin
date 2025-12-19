@@ -268,39 +268,64 @@ const TemplatePreviewPage = () => {
     return (
         <div className="maincontent">
             {/* Print Styles */}
-            <style>
+            <style type="text/css" media="print">
                 {`
-                    @media print {
-                        body * {
-                            visibility: hidden !important;
-                        }
-                        
-                        .print-content,
-                        .print-content * {
-                            visibility: visible !important;
-                        }
-                        
-                        .print-content {
-                            position: absolute !important;
-                            left: 0 !important;
-                            top: 0 !important;
-                            width: 210mm !important;
-                            min-height: 297mm !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                            background: white !important;
-                        }
-                        
-                        @page {
-                            size: A4;
-                            margin: 15mm 20mm;
-                        }
-                        
-                        .no-print {
-                            display: none !important;
-                        }
-                    }
-                `}
+        /* Remove ALL browser-added headers and footers (date, URL, page title, page numbers) */
+        @page {
+            size: A4;
+            margin: 0; /* We control margins via padding in the letter */
+        }
+
+        /* Critical: Hide browser default header/footer */
+        @page :first { margin-top: 0; }
+        @page :left { margin-left: 0; }
+        @page :right { margin-right: 0; }
+.print-page {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100% !important;
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+
+        /* Hide everything except the actual letter content */
+        body * {
+            visibility: hidden !important;
+        }
+
+        .print-content,
+        .print-content * {
+            visibility: visible !important;
+        }
+
+        .print-content {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            min-height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+        }
+
+        /* Hide buttons, navbar, debug info, etc. */
+        .no-print {
+            display: none !important;
+        }
+        /* Extra safety: remove any browser pseudo-elements */
+        body::before,
+        body::after {
+            display: none !important;
+        }
+    `}
             </style>
 
             <Container fluid className="py-4 no-print">
@@ -340,29 +365,6 @@ const TemplatePreviewPage = () => {
                     <AppointmentLetter data={templateData} />
                 )}
             </div>
-
-            {/* Debug info - Hidden during print */}
-            {process.env.NODE_ENV === 'development' && (
-                <Container fluid className="mt-4 no-print">
-                    <Row>
-                        <Col>
-                            <details>
-                                <summary className="text-muted">Debug Information</summary>
-                                <div className="mt-2">
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <h6>Template Data:</h6>
-                                            <pre className="bg-light p-2 small">
-                                                {JSON.stringify(templateData, null, 2)}
-                                            </pre>
-                                        </div>
-                                    </div>
-                                </div>
-                            </details>
-                        </Col>
-                    </Row>
-                </Container>
-            )}
         </div>
     );
 };

@@ -25,7 +25,8 @@ export const letterStyles = {
         width: '210mm',
         minHeight: '297mm',
         backgroundColor: 'white',
-        padding: '15mm 20mm 25mm 20mm', // Extra bottom padding for footer
+        padding: '20mm 20mm 70mm 20mm',
+        display: 'table',
         margin: '0 auto',
         boxSizing: 'border-box',
         fontFamily: '"Times New Roman", Times, serif',
@@ -34,49 +35,17 @@ export const letterStyles = {
         color: '#000',
         position: 'relative'
     },
-    highlight: {
-        backgroundColor: '#FFFF00',
-        padding: '0 2px'
-    },
     bold: { fontWeight: 'bold' },
-    center: { textAlign: 'center' },
+    center: { textAlign: 'center', paddingTop: 25 },
     justify: { textAlign: 'justify' },
     table: { width: '100%', borderCollapse: 'collapse', margin: '15px 0' },
-    td: { border: '1px solid #000', padding: '6px' },
-    th: { border: '1px solid #000', padding: '6px', backgroundColor: '#f9f9f9', textAlign: 'left' },
+    td: { padding: '6px' },
+    th: { padding: '6px', backgroundColor: '#f9f9f9', textAlign: 'left' },
     signatureRow: {
         display: 'flex',
         justifyContent: 'space-between',
         marginTop: '50px'
     }
-};
-
-// Highlight component
-export const Highlight = ({ text, type = 'regular' }) => {
-    const style = type === 'underline'
-        ? {
-            borderBottom: '2px solid #000',
-            backgroundColor: 'transparent',
-            padding: '2px 4px',
-            fontWeight: 'bold',
-            display: 'inline-block',
-            margin: '0 2px'
-        }
-        : {
-            backgroundColor: '#ffffcc',
-            padding: '2px 4px',
-            borderRadius: '2px',
-            borderBottom: '1px solid #ffcc00',
-            fontWeight: 'bold',
-            display: 'inline-block',
-            margin: '0 2px'
-        };
-
-    return (
-        <span style={style}>
-            {text || '___________________'}
-        </span>
-    );
 };
 
 // Document Watermark Component
@@ -107,26 +76,28 @@ export const DocumentWatermark = ({ webSettingData }) => {
 };
 
 // Simple Header Component - Only logo with header line
+// In LetterComponents.jsx - Update LetterHeader
 export const LetterHeader = ({ webSettingData }) => {
     const headerColor = webSettingData?.header_color || '#811845';
 
     return (
         <div style={{
-            marginBottom: '20px',
-            position: 'relative'
+            marginBottom: '40px',
+            position: 'relative',
+            paddingTop: '10px' // Space for the line
         }}>
-            {/* Header line at top */}
+            {/* Always show the header colored line on EVERY page */}
             <div style={{
                 height: '5px',
                 backgroundColor: headerColor,
-                marginBottom: '15px'
+                marginBottom: '25px'
             }} />
 
-            {/* Logo only - positioned at top left */}
+            {/* Logo positioned below the line */}
             {webSettingData?.logo_image && (
                 <div style={{
                     position: 'absolute',
-                    top: '5px',
+                    top: '15px',  // Below the colored line
                     left: '0'
                 }}>
                     <img
@@ -145,106 +116,77 @@ export const LetterHeader = ({ webSettingData }) => {
     );
 };
 
-// Footer Component - Different for first page vs other pages
-export const LetterFooter = ({
-    webSettingData,
-    showSignature = true,
-    isFirstPage = false
-}) => {
+// Replace FooterWithTextAndSignature
+export const FooterWithTextAndSignature = ({ webSettingData, showSignature = true }) => {
     const footerColor = webSettingData?.footer_color || '#3caf40';
-    const cleanWebsite = webSettingData?.website_link?.replace("https://hrms.", "https://") ||
-        (webSettingData?.website_link || 'N/A');
+    const cleanWebsite = webSettingData?.website_link?.replace('https://hrms.', 'https://') || webSettingData?.website_link || 'N/A';
 
     return (
-        <div style={{
-            position: 'absolute',
-            bottom: '15mm',
-            left: '20mm',
-            right: '20mm',
-            borderTop: `2px solid ${footerColor}`,
-            paddingTop: '8px',
-            marginTop: '20px',
-            height: '40px'
-        }}>
-            {/* First page: Company info left + Signature right */}
-            {isFirstPage ? (
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    height: '100%'
-                }}>
-                    {/* Company Contact Info - Left side */}
-                    <div style={{
-                        fontFamily: "'Times New Roman', Times, serif",
-                        fontSize: '8pt',
-                        color: '#1d1e30',
-                        textAlign: 'left'
-                    }}>
-                        <p style={{ margin: '0 0 2px 0', fontWeight: 'bold' }}>
-                            {webSettingData?.meta_title || 'Hindustan Latex Family Planning Promotion Trust'}
-                        </p>
-                        <p style={{ margin: '0 0 2px 0' }}>
-                            <strong>Corporate Office:</strong> {webSettingData?.office_address || 'B-14 A, IInd Floor, Sector - 62, Gautam Budh Nagar, Noida-201301'}
-                        </p>
-                        <p style={{ margin: '0' }}>
-                            Tel: {webSettingData?.organization_mobile_no || '9838387070'} |
-                            Email: {webSettingData?.organization_email_id || 'duplextechnology@gmail.com'} |
-                            Website: {cleanWebsite}
-                        </p>
-                    </div>
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '40px' }}>
+                <div style={{ fontSize: '8pt', color: '#1d1e30' }}>
+                    <p style={{ margin: '0 0 2px 0', fontWeight: 'bold' }}>
+                        {webSettingData?.meta_title || 'Hindustan Latex Family Planning Promotion Trust'}
+                    </p>
 
-                    {/* HR Signature - Right side */}
-                    {showSignature && webSettingData?.hod_hr_signature && (
-                        <div style={{
-                            textAlign: 'right'
-                        }}>
-                            <img
-                                src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
-                                alt="HR Signature"
-                                style={{
-                                    width: '80px',
-                                    height: '40px',
-                                    objectFit: 'contain',
-                                    marginBottom: '2px'
-                                }}
-                            />
-                        </div>
-                    )}
-                </div>
-            ) : (
-                /* Other pages: Only signature at right corner */
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    height: '100%'
-                }}>
-                    {showSignature && webSettingData?.hod_hr_signature && (
-                        <div style={{
-                            textAlign: 'right'
-                        }}>
-                            <img
-                                src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
-                                alt="HR Signature"
-                                style={{
-                                    width: '80px',
-                                    height: '40px',
-                                    objectFit: 'contain',
-                                    marginBottom: '2px'
-                                }}
-                            />
-                        </div>
-                    )}
-                </div>
-            )}
+                    <p style={{ margin: '0 0 2px 0' }}>
+                        <strong>Corporate Office:</strong>{' '}
+                        {webSettingData?.office_address || 'B-14 A, IInd Floor, Sector - 62, Noida-201301'}
+                    </p>
 
-            {/* Bottom footer line */}
-            <div style={{
-                height: '3px',
-                marginTop: '4px',
-                backgroundColor: footerColor
-            }} />
+                    <p style={{ margin: 0 }}>
+                        Tel: {webSettingData?.organization_mobile_no || 'N/A'} |{''}
+                        Email:{' '}
+                        <a
+                            href={`mailto:${webSettingData?.organization_email_id || 'N/A'}`}
+                            style={{ color: '#1d1e30', textDecoration: 'none' }}
+                        >
+                            {webSettingData?.organization_email_id || 'N/A'}
+                        </a>{' '}
+                        | Website:{' '}
+                        <a
+                            href={
+                                cleanWebsite?.startsWith('http')
+                                    ? cleanWebsite
+                                    : `https://${cleanWebsite}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: '#1d1e30', textDecoration: 'none' }}
+                        >
+                            {cleanWebsite}
+                        </a>
+                    </p>
+                </div>
+                {showSignature && webSettingData?.hod_hr_signature && (
+                    <img
+                        src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
+                        alt="HR Signature"
+                        style={{ width: '80px', height: '40px', objectFit: 'contain' }}
+                    />
+                )}
+            </div>
+            <div style={{ height: '3px', backgroundColor: footerColor, marginTop: '4px' }} />
+        </div>
+    );
+};
+
+// Replace FooterWithSignatureOnly
+export const FooterWithSignatureOnly = ({ webSettingData, showSignature = true }) => {
+    const footerColor = webSettingData?.footer_color || '#3caf40';
+
+    return (
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '40px' }}>
+                {showSignature && webSettingData?.hod_hr_signature && (
+                    <img
+                        src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
+                        alt="HR Signature"
+                        style={{ width: '80px', height: '40px', objectFit: 'contain' }}
+                    />
+                )}
+            </div>
+            <div style={{ height: '3px', backgroundColor: footerColor, marginTop: '4px' }} />
         </div>
     );
 };
@@ -290,16 +232,16 @@ export const WitnessSignature = ({ witnessNumber = 1 }) => {
         }}>
             <p style={{
                 margin: '0 0 5px 0',
-                fontSize: '9pt',
+                fontSize: '11pt',
                 fontFamily: "'Times New Roman', Times, serif",
                 textDecoration: 'underline'
             }}>
                 Witness {witnessNumber}
             </p>
-            <p style={{ margin: '3px 0', fontSize: '8pt' }}>Signature: __________________</p>
-            <p style={{ margin: '3px 0', fontSize: '8pt' }}>Name: __________________</p>
-            <p style={{ margin: '3px 0', fontSize: '8pt' }}>Address: __________________</p>
-            <p style={{ margin: '3px 0', fontSize: '8pt' }}>Dated: __________________</p>
+            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Signature: __________________</p>
+            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Name: __________________</p>
+            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Address: __________________</p>
+            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Dated: __________________</p>
         </div>
     );
 };

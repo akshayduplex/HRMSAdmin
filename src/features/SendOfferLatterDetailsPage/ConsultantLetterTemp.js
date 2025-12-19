@@ -4,16 +4,29 @@ import {
     letterStyles,
     LetterHeader,
     LetterFooter,
-    Highlight,
     DocumentWatermark,
-    EmployeeSignature,
     WitnessSignature,
-    getCurrentDate
+    getCurrentDate,
+    FooterWithTextAndSignature,
+    FooterWithSignatureOnly
 } from './components/LetterComponents';
+import config from '../../config/config';
+const footerStyle = {
+    position: 'absolute',
+    bottom: '25px',
+    left: '0',
+    right: '0',
+};
+const pageStyle = {
+    minHeight: '1122px',
+    position: 'relative',
+    // paddingBottom: '120px',
+};
+
 
 export const ConsultantLetter = ({ data }) => {
     const currentDate = data?.currentDate || getCurrentDate();
-
+    const footerColor = data.webSettingData?.footer_color || '#3caf40';
     return (
         <div style={letterStyles.page}>
             {/* Watermark */}
@@ -24,20 +37,17 @@ export const ConsultantLetter = ({ data }) => {
 
             {/* Title */}
             <div style={letterStyles.center}>
-                <h2 style={{ margin: '20px 0 5px 0', fontSize: '14pt' }}>
+                <h2 style={{ margin: '20px 0 10px 0', fontSize: '14pt' }}>
                     Terms of Contract for Appointment as
                 </h2>
-                <h2 style={{ margin: '0 0 20px 0', fontSize: '14pt', textDecoration: 'underline' }}>
-                    Consultant (<Highlight text={data?.designation} />)
-                </h2>
+                <h2 style={{ margin: '0 0 20px 0', fontSize: '14pt', textDecoration: 'underline', }}>{data?.designation}</h2>
             </div>
 
             {/* Main Content */}
             <div style={letterStyles.justify}>
                 <p style={{ marginBottom: '20px' }}>
-                    <strong>ARTICLES OF AGREEMENT</strong> made this day, the
-                    <Highlight text={data?.joiningDate} /> between <Highlight text={data?.employeeName} />
-                    resident of <Highlight text={data?.relativeName} />, At- <Highlight text={data?.address} />,
+                    <strong>ARTICLES OF AGREEMENT</strong> made this day, the <span style={{ paddingRight: '5px' }}> {data?.joiningDate} </span> between {data?.employeeName}
+                    resident of {data?.relativeName}, At- {data?.address},
                     hereinafter called the Party, of the one part and the <strong>Hindustan Latex
                         Family Planning Promotion Trust (HLFPPT)</strong> B-14 A, IInd Floor, Sector - 62, Gautam Budh
                     Nagar, Noida-201301, hereinafter called the Trust, of the other part.
@@ -57,8 +67,8 @@ export const ConsultantLetter = ({ data }) => {
                     {/* Terms 1-7 */}
                     <li style={{ marginBottom: '10px' }}>
                         The party of the first part shall remain in the service of the Trust as
-                        <strong> Consultant</strong> from <Highlight text={data?.joiningDate} /> to
-                        <Highlight text={data?.contractExpiryDate} /> or till the completion of the project
+                        <strong> Consultant</strong> from <span style={{ paddingRight: '5px' }}>{data?.joiningDate} </span> to
+                        {data?.contractExpiryDate} or till the completion of the project
                         whichever is earlier (hereinafter called 'contractual period') subject to the
                         provisions herein contained.
                     </li>
@@ -103,11 +113,10 @@ export const ConsultantLetter = ({ data }) => {
                     </li>
                 </ol>
 
-                {/* Footer for FIRST PAGE */}
-                <LetterFooter
+                {/* Footer for FIRST PAGE - Full text + signature */}
+                <FooterWithTextAndSignature
                     webSettingData={data?.webSettingData}
                     showSignature={true}
-                    isFirstPage={true}
                 />
             </div>
 
@@ -120,7 +129,7 @@ export const ConsultantLetter = ({ data }) => {
                 <LetterHeader webSettingData={data?.webSettingData} />
 
                 <div style={letterStyles.justify}>
-                    <ol start="8" style={{ paddingLeft: '20px', marginBottom: '30px' }}>
+                    <ol start="8">
                         <li style={{ marginBottom: '10px' }}>
                             The party acknowledges that in the course of its operations, HLFPPT has developed and
                             gathered extensive data, information, procedures, processes methods and system of a
@@ -176,7 +185,14 @@ export const ConsultantLetter = ({ data }) => {
                                 </td>
                             </tr>
                             <tr>
-                                <td style={{ ...letterStyles.td, height: '40px' }}>Signature:</td>
+                                <td style={{ ...letterStyles.td }}>
+                                    <div>Signature:</div>
+                                    <img
+                                        src={config.IMAGE_PATH + data?.webSettingData?.hod_hr_signature}
+                                        alt="HR Signature"
+                                        style={{ width: '120px', height: '50px', objectFit: 'contain' }}
+                                    />
+                                </td>
                                 <td style={letterStyles.td}></td>
                                 <td style={letterStyles.td}>Signature:</td>
                                 <td style={letterStyles.td}></td>
@@ -185,19 +201,19 @@ export const ConsultantLetter = ({ data }) => {
                                 <td style={letterStyles.td}>Name:</td>
                                 <td style={letterStyles.td}><strong>Awanish Awasthi</strong></td>
                                 <td style={letterStyles.td}>Name:</td>
-                                <td style={letterStyles.td}><Highlight text={data?.employeeName} /></td>
+                                <td style={letterStyles.td}>{data?.employeeName}</td>
                             </tr>
                             <tr>
                                 <td style={letterStyles.td}>Designation:</td>
                                 <td style={letterStyles.td}><strong>Associate National Lead–HR & Admin</strong></td>
                                 <td style={letterStyles.td}>Designation in the Trust:</td>
-                                <td style={letterStyles.td}><Highlight text={`Consultant (${data?.designation})`} /></td>
+                                <td style={letterStyles.td}>{`Consultant (${data?.designation})`}</td>
                             </tr>
                             <tr>
                                 <td style={letterStyles.td}>Dated:</td>
-                                <td style={letterStyles.td}><Highlight text={currentDate} /></td>
+                                <td style={letterStyles.td}>{currentDate}</td>
                                 <td style={letterStyles.td}>Dated:</td>
-                                <td style={letterStyles.td}><Highlight text={currentDate} /></td>
+                                <td style={letterStyles.td}>{currentDate}</td>
                             </tr>
                             {/* Witness Section */}
                             <tr>
@@ -210,140 +226,141 @@ export const ConsultantLetter = ({ data }) => {
                             </tr>
                         </tbody>
                     </table>
-
-                    {/* Footer for SECOND PAGE (only signature) */}
-                    <LetterFooter
-                        webSettingData={data?.webSettingData}
-                        showSignature={true}
-                        isFirstPage={false}
-                    />
                 </div>
             </div>
+            <div style={{ height: '3px', backgroundColor: footerColor, marginBottom: '15px' }} />
 
             {/* Page Break for Appendix I (Page 3) */}
             <div style={{ pageBreakBefore: 'always' }}>
-                {/* Watermark */}
-                <DocumentWatermark webSettingData={data?.webSettingData} />
+                <div style={pageStyle}>
+                    {/* Watermark */}
+                    <DocumentWatermark webSettingData={data?.webSettingData} />
 
-                {/* Header */}
-                <LetterHeader webSettingData={data?.webSettingData} />
+                    {/* Header */}
+                    <LetterHeader webSettingData={data?.webSettingData} />
 
-                <div style={letterStyles.center}>
-                    <h2 style={{ margin: '0 0 30px 0', fontSize: '14pt' }}>Appendix-I</h2>
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '12pt' }}>
-                        Agreement between HLFPPT and <Highlight text={data?.employeeName} />
-                    </h3>
-                    <h4 style={{ margin: '0', textDecoration: 'underline' }}>
-                        Terms of reference for the post of Consultant
-                    </h4>
-                </div>
+                    {/* Page Content */}
+                    <div style={{ ...letterStyles.justify }}>
+                        <div style={letterStyles.center}>
+                            <h2 style={{ margin: '0 0 30px 0', fontSize: '14pt' }}>Appendix-I</h2>
+                            <h3 style={{ margin: '0 0 20px 0', fontSize: '12pt' }}>
+                                Agreement between HLFPPT and {data?.employeeName}
+                            </h3>
+                            <h4 style={{ margin: '0', textDecoration: 'underline' }}>
+                                Terms of reference for the post of Consultant
+                            </h4>
+                        </div>
+                        <div style={{ ...letterStyles.justify, marginTop: '30px' }}>
+                            <h5 style={{ margin: '20px 0 10px 0' }}>
+                                Consultancy fee
+                            </h5>
+                            <p style={{ marginBottom: '10px' }}>
+                                The party shall be paid a consultancy fee of <strong>Rs.
+                                    {data?.feeAmount} (Rupees {data?.feeAmountWords})</strong> per
+                                {data?.paymentType?.toLowerCase() === 'month' ? ' month' : ' day'}
+                                against submission of invoice and Time Sheet.
+                            </p>
+                            <p style={{ marginBottom: '20px' }}>
+                                The month being defined as minimum of {data?.workingDays} working days per
+                                calendar month.
+                            </p>
 
-                <div style={{ ...letterStyles.justify, marginTop: '30px' }}>
-                    <p style={{ marginBottom: '20px' }}>
-                        The normal place of work for the Party will be at <Highlight text={data?.location} /> but
-                        his/her services during the period will be available to any other sites of HLFPPT or its
-                        projects deployed anywhere in India, in accordance with the concerned projects policy and
-                        rules for the time being in force.
-                    </p>
+                            <h5 style={{ margin: '20px 0 10px 0' }}>
+                                TDS
+                            </h5>
+                            <p style={{ marginBottom: '30px' }}>
+                                The Trust shall deduct income tax at source (TDS) as per Income Tax Act, which shall be
+                                deposited from the remuneration of the Party.
+                            </p>
 
-                    <h5 style={{ margin: '20px 0 10px 0', textDecoration: 'underline' }}>
-                        Terms of reference for Consultant (<Highlight text={data?.designation} />)
-                    </h5>
-                    <ul style={{ paddingLeft: '20px', marginBottom: '20px' }}>
-                        <li style={{ marginBottom: '5px' }}>•</li>
-                        <li style={{ marginBottom: '5px' }}>•</li>
-                        <li style={{ marginBottom: '5px' }}>•</li>
-                    </ul>
-
-                    <h5 style={{ margin: '30px 0 10px 0', textDecoration: 'underline' }}>
-                        Reporting
-                    </h5>
-                    <p style={{ marginBottom: '20px' }}>
-                        The party will report on day-to-day activities to the <Highlight text={data?.reportingTo} />,
-                        <Highlight text={data?.location} /> who will be responsible for monitoring and evaluating
-                        his/her performance.
-                    </p>
-
-                    <h5 style={{ margin: '30px 0 10px 0', textDecoration: 'underline' }}>
-                        Relationship of the Parties
-                    </h5>
-                    <p style={{ marginBottom: '10px' }}>
-                        This Agreement and any rights hereunder can neither be assigned nor subcontracted by the
-                        Party to a third party.
-                    </p>
-                    <p style={{ marginBottom: '30px' }}>
-                        The Party is in no way a legal representative or agent or employee or subordinate of the
-                        Trust for any purpose whatsoever and the Party has no right or authority to assume or
-                        create, in writing or otherwise, any obligation of any kind, express or implied, or enter
-                        into any agreement in the name of or on behalf of the Trust.
-                    </p>
-
-                    <div style={{ textAlign: 'center', margin: '40px 0' }}>
-                        <p>***********</p>
+                            <div style={{ textAlign: 'center', margin: '40px 0' }}>
+                                <p>***********</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Footer for THIRD PAGE (only signature) */}
-                    <LetterFooter
-                        webSettingData={data?.webSettingData}
-                        showSignature={true}
-                        isFirstPage={false}
-                    />
+                    {/* Footer pinned to bottom */}
+                    <div style={footerStyle}>
+                        <FooterWithSignatureOnly
+                            webSettingData={data?.webSettingData}
+                            showSignature={true}
+                        />
+                    </div>
                 </div>
             </div>
+
 
             {/* Page Break for Appendix II (Page 4) */}
             <div style={{ pageBreakBefore: 'always' }}>
-                {/* Watermark */}
-                <DocumentWatermark webSettingData={data?.webSettingData} />
+                <div style={pageStyle}>
+                    <DocumentWatermark webSettingData={data?.webSettingData} />
+                    <LetterHeader webSettingData={data?.webSettingData} />
 
-                {/* Header */}
-                <LetterHeader webSettingData={data?.webSettingData} />
+                    <div style={{ ...letterStyles.justify }}>
+                        <div style={letterStyles.center}>
+                            <h2 style={{ margin: '0 0 30px 0', fontSize: '14pt' }}>Appendix-II</h2>
+                            <h3 style={{ margin: '0 0 20px 0', fontSize: '12pt' }}>
+                                Agreement between HLFPPT and {data?.employeeName}
+                            </h3>
+                            <h4 style={{ margin: '0', textDecoration: 'underline' }}>
+                                Agreed Consultancy fee for the post of <strong>Consultant</strong>
+                            </h4>
+                        </div>
+                        <div style={{ ...letterStyles.justify, marginTop: '30px' }}>
+                            <p style={{ marginBottom: '20px' }}>
+                                The normal place of work for the Party will be at {data?.location}  but
+                                his/her services during the period will be available to any other sites of HLFPPT or its
+                                projects deployed anywhere in India, in accordance with the concerned projects policy and
+                                rules for the time being in force.
+                            </p>
 
-                <div style={letterStyles.center}>
-                    <h2 style={{ margin: '0 0 30px 0', fontSize: '14pt' }}>Appendix-II</h2>
-                    <h3 style={{ margin: '0 0 20px 0', fontSize: '12pt' }}>
-                        Agreement between HLFPPT and <Highlight text={data?.employeeName} />
-                    </h3>
-                    <h4 style={{ margin: '0', textDecoration: 'underline' }}>
-                        Agreed Consultancy fee for the post of <strong>Consultant</strong>
-                    </h4>
-                </div>
+                            <h5 style={{ margin: '20px 0 10px 0', textDecoration: 'underline' }}>
+                                Terms of reference for Consultant ({data?.designation})
+                            </h5>
+                            <ul style={{ paddingLeft: '20px', marginBottom: '20px' }}>
+                                {/* <li style={{ marginBottom: '5px' }}>•</li>
+                        <li style={{ marginBottom: '5px' }}>•</li>
+                        <li style={{ marginBottom: '5px' }}>•</li> */}
+                            </ul>
 
-                <div style={{ ...letterStyles.justify, marginTop: '30px' }}>
-                    <h5 style={{ margin: '20px 0 10px 0' }}>
-                        Consultancy fee
-                    </h5>
-                    <p style={{ marginBottom: '10px' }}>
-                        The party shall be paid a consultancy fee of <strong>Rs.
-                            <Highlight text={data?.feeAmount} /> (Rupees <Highlight text={data?.feeAmountWords} />)</strong> per
-                        {data?.paymentType?.toLowerCase() === 'month' ? ' month' : ' day'}
-                        against submission of invoice and Time Sheet.
-                    </p>
-                    <p style={{ marginBottom: '20px' }}>
-                        The month being defined as minimum of <Highlight text={data?.workingDays} /> working days per
-                        calendar month.
-                    </p>
+                            <h5 style={{ margin: '30px 0 10px 0', textDecoration: 'underline' }}>
+                                Reporting
+                            </h5>
+                            <p style={{ marginBottom: '20px' }}>
+                                The party will report on day-to-day activities to the {data?.reportingTo},
+                                {data?.location} who will be responsible for monitoring and evaluating
+                                his/her performance.
+                            </p>
 
-                    <h5 style={{ margin: '20px 0 10px 0' }}>
-                        TDS
-                    </h5>
-                    <p style={{ marginBottom: '30px' }}>
-                        The Trust shall deduct income tax at source (TDS) as per Income Tax Act, which shall be
-                        deposited from the remuneration of the Party.
-                    </p>
+                            <h5 style={{ margin: '30px 0 10px 0', textDecoration: 'underline' }}>
+                                Relationship of the Parties
+                            </h5>
+                            <p style={{ marginBottom: '10px' }}>
+                                This Agreement and any rights hereunder can neither be assigned nor subcontracted by the
+                                Party to a third party.
+                            </p>
+                            <p style={{ marginBottom: '30px' }}>
+                                The Party is in no way a legal representative or agent or employee or subordinate of the
+                                Trust for any purpose whatsoever and the Party has no right or authority to assume or
+                                create, in writing or otherwise, any obligation of any kind, express or implied, or enter
+                                into any agreement in the name of or on behalf of the Trust.
+                            </p>
 
-                    <div style={{ textAlign: 'center', margin: '40px 0' }}>
-                        <p>***********</p>
+                            <div style={{ textAlign: 'center', margin: '30px 0' }}>
+                                <p>***********</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Footer for FOURTH PAGE (only signature) */}
-                    <LetterFooter
-                        webSettingData={data?.webSettingData}
-                        showSignature={true}
-                        isFirstPage={false}
-                    />
+                    <div style={footerStyle}>
+                        <FooterWithSignatureOnly
+                            webSettingData={data?.webSettingData}
+                            showSignature={true}
+                        />
+                    </div>
                 </div>
             </div>
+
         </div>
     );
 };
