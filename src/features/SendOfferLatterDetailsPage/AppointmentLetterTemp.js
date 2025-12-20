@@ -11,7 +11,24 @@ export const AppointmentLetter = ({ data }) => {
     };
 
     const documentDate = data?.date ? formatDate(data.date) : formatDate(new Date());
+    // Format currency for salary display
+    const formatCurrency = (amount) => {
+        if (!amount && amount !== 0) return '0';
+        const num = Number(amount);
+        return num.toLocaleString('en-IN', {
+            maximumFractionDigits: 0
+        });
+    };
 
+    // Function to calculate annual amount
+    const calculateAnnual = (monthly) => {
+        const monthlyNum = Number(monthly) || 0;
+        return monthlyNum * 12;
+    };
+
+    // Check if salary breakup data exists
+    const hasSalaryBreakup = data?.salaryBreakup && !data.salaryBreakup.isEmpanelledOrConsultant;
+    const salaryData = hasSalaryBreakup ? data.salaryBreakup : null;
     return (
         <div style={{
             ...letterStyles.page,
@@ -174,7 +191,10 @@ export const AppointmentLetter = ({ data }) => {
                         </li>
 
                         <li style={{ marginBottom: '12px' }}>
-                            During your appointment as <strong>{data?.designation}</strong>, <strong>{data?.projectName}</strong>, <strong>{data?.location}</strong> for a fixed term you will be entitled for a annual gross salary of <strong>{data?.annualGrossSalaryWords}</strong> per annum.
+                            During your appointment as <strong>{data?.designation}</strong>, <strong>{data?.projectName}</strong>, <strong>{data?.location}</strong> for a fixed term you will be entitled for a annual gross salary of  <strong> {salaryData ?
+                                `Rs. ${formatCurrency(salaryData.totalCTOAnnual)} (${data?.annualGrossSalaryWords})` :
+                                `${data?.annualGrossSalaryWords}`
+                            } </strong> per annum.
                         </li>
 
                         <li style={{ marginBottom: '12px' }}>
@@ -196,7 +216,7 @@ export const AppointmentLetter = ({ data }) => {
                         <li style={{ marginBottom: '12px' }}>
                             This appointment is made on the basis of and relying on the particulars and personal data submitted by you at the time of Interview and joining and will be deemed to be void ab initio in the event of any such particulars or data being false or incorrect. You shall inform the Human Resource Department, HLFPPT of any changes in such particulars of the data within <strong>three days</strong> of any such change.
                         </li>
-                         <li style={{ marginBottom: '12px' }}>
+                        <li style={{ marginBottom: '12px' }}>
                             You shall, during the period of your contractual appointment pursuant hereto, devote your whole time and attention to the work entrusted to you and shall not engage yourself directly or indirectly in any other business, work or service.
                         </li>
 
@@ -221,101 +241,101 @@ export const AppointmentLetter = ({ data }) => {
             </div>
 
             {/* PAGE 3 - Page Break */}
-          <div  style={{
-    pageBreakBefore: 'always',
-    minHeight: '297mm',
-    padding: '15mm 20mm',
-    position: 'relative'
-  }}
->
-  {/* Header */}
-  <LetterHeader webSettingData={data?.webSettingData} />
+            <div style={{
+                pageBreakBefore: 'always',
+                minHeight: '297mm',
+                padding: '15mm 20mm',
+                position: 'relative'
+            }}
+            >
+                {/* Header */}
+                <LetterHeader webSettingData={data?.webSettingData} />
 
-  {/* Terms and Conditions */}
-  <div style={{ textAlign: 'justify', lineHeight: '1.5' }}>
-    <ol start="13" style={{ paddingLeft: '25px', marginBottom: '20px' }}>
-      <li style={{ marginBottom: '12px', paddingTop: '45px' }}>
-        You will abide by all the applicable Service Rules and Regulations of
-        HLFPPT/its Project, including its personal conduct guidelines, in force
-        from time to time, which you are deemed to have read, understood and
-        agreed. The organization will have the right to vary or modify the same
-        or all or any of the terms and conditions of your temporary appointment
-        at any time, which will be binding on you.
-      </li>
+                {/* Terms and Conditions */}
+                <div style={{ textAlign: 'justify', lineHeight: '1.5' }}>
+                    <ol start="13" style={{ paddingLeft: '25px', marginBottom: '20px' }}>
+                        <li style={{ marginBottom: '12px', paddingTop: '45px' }}>
+                            You will abide by all the applicable Service Rules and Regulations of
+                            HLFPPT/its Project, including its personal conduct guidelines, in force
+                            from time to time, which you are deemed to have read, understood and
+                            agreed. The organization will have the right to vary or modify the same
+                            or all or any of the terms and conditions of your temporary appointment
+                            at any time, which will be binding on you.
+                        </li>
 
-      <li style={{ marginBottom: '12px' }}>
-        Your appointment and service pursuant hereto may be terminated by either
-        of us by giving to each other <strong>One-month</strong> written notice or
-        by paying <strong>One-month</strong> Salary (Basic plus HRA) in lieu of
-        such notice.
-      </li>
+                        <li style={{ marginBottom: '12px' }}>
+                            Your appointment and service pursuant hereto may be terminated by either
+                            of us by giving to each other <strong>One-month</strong> written notice or
+                            by paying <strong>One-month</strong> Salary (Basic plus HRA) in lieu of
+                            such notice.
+                        </li>
 
-      <li style={{ marginBottom: '12px' }}>
-        Notwithstanding anything herein contained, in the event of any breach by
-        you of any of the terms and conditions herein contained or of any Rules
-        and Regulations of the organization, we will have the right to terminate
-        your appointment and service without any notice or compensation.
-      </li>
+                        <li style={{ marginBottom: '12px' }}>
+                            Notwithstanding anything herein contained, in the event of any breach by
+                            you of any of the terms and conditions herein contained or of any Rules
+                            and Regulations of the organization, we will have the right to terminate
+                            your appointment and service without any notice or compensation.
+                        </li>
 
-      <li style={{ marginBottom: '12px' }}>
-        The tribunals and courts in <strong>Trivandrum</strong> will have the
-        exclusive jurisdiction in respect of all matters pertaining to your
-        contractual agreement with HLFPPT.
-      </li>
+                        <li style={{ marginBottom: '12px' }}>
+                            The tribunals and courts in <strong>Trivandrum</strong> will have the
+                            exclusive jurisdiction in respect of all matters pertaining to your
+                            contractual agreement with HLFPPT.
+                        </li>
 
-      <li>
-        Please sign on all the pages of the duplicate copy of the letter in token
-        of your acceptance of the terms and conditions herein contained and
-        return it to us.
-      </li>
-    </ol>
+                        <li>
+                            Please sign on all the pages of the duplicate copy of the letter in token
+                            of your acceptance of the terms and conditions herein contained and
+                            return it to us.
+                        </li>
+                    </ol>
 
-    {/* Closing */}
-    <p>Thanking You,</p>
+                    {/* Closing */}
+                    <p>Thanking You,</p>
 
-    <p style={{ marginTop: '20px' }}>Yours Sincerely,</p>
+                    <p style={{ marginTop: '20px' }}>Yours Sincerely,</p>
 
-    <p>
-      For <strong>HINDUSTAN LATEX FAMILY PLANNING PROMOTION TRUST</strong>,
-    </p>
+                    <p>
+                        For <strong>HINDUSTAN LATEX FAMILY PLANNING PROMOTION TRUST</strong>,
+                    </p>
 
-    <p style={{ marginTop: '40px', marginBottom: '5px' }}>
-      <strong>Awanish Awasthi</strong>
-    </p>
-    <p>Associate National Lead- HR &amp; Admin</p>
-<img
-                                        src={config.IMAGE_PATH + data.webSettingData.hod_hr_signature}
-                                        alt="HR Signature"
-                                        style={{ width: '120px', height: '50px', objectFit: 'contain' }}
-                                    />
-    {/* Declaration Section */}
-    <p
-      style={{
-        marginTop: '40px',
-        textAlign: 'justify'
-      }}
-    >
-      I, <strong>{data?.employeeName}</strong>, have joined on{' '}
-      <strong>{formatDate(data?.joiningDate)}</strong> solemnly declare that I
-      have read and understood thoroughly the rules of service and terms of
-      appointment of my service, and I do hereby agree with all terms as above
-      and I shall abide by all general rules of service which are now or
-      hereafter to be in force and accordingly I accept the appointment of
-      service with HLFPPT.
-    </p>
+                    <p style={{ marginTop: '40px', marginBottom: '5px' }}>
+                        <strong>Awanish Awasthi</strong>
+                    </p>
+                    <p>Associate National Lead- HR &amp; Admin</p>
+                    <img
+                        src={config.IMAGE_PATH + data?.webSettingData?.hod_hr_signature}
+                        alt="HR Signature"
+                        style={{ width: '120px', height: '50px', objectFit: 'contain' }}
+                    />
+                    {/* Declaration Section */}
+                    <p
+                        style={{
+                            marginTop: '40px',
+                            textAlign: 'justify'
+                        }}
+                    >
+                        I, <strong>{data?.employeeName}</strong>, have joined on{' '}
+                        <strong>{formatDate(data?.joiningDate)}</strong> solemnly declare that I
+                        have read and understood thoroughly the rules of service and terms of
+                        appointment of my service, and I do hereby agree with all terms as above
+                        and I shall abide by all general rules of service which are now or
+                        hereafter to be in force and accordingly I accept the appointment of
+                        service with HLFPPT.
+                    </p>
 
-    {/* Employee Signature */}
-    <div style={{ marginTop: '30px' }}>
-      <p>
-        <strong>Name:</strong> {data?.employeeName}
-      </p>
-      <p>
-        <strong>Date:</strong> ______________________
-        <span style={{ float: 'right' }}>(Signature)</span>
-      </p>
-    </div>
-  </div>
-</div>
+                    {/* Employee Signature */}
+                    <div style={{ marginTop: '30px' }}>
+                        <p>
+                            <strong>Name:</strong> {data?.employeeName}
+                        </p>
+                        <p>
+                            <strong>Date:</strong> ______________________
+                            <span style={{ float: 'right' }}>(Signature)</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             {/* PAGE 4 - Page Break (Annexure) */}
             <div style={{
@@ -361,85 +381,404 @@ export const AppointmentLetter = ({ data }) => {
                             </p>
                         </div>
 
-                        {/* Salary Table */}
-                        <table style={{
-                            width: '100%',
-                            borderCollapse: 'collapse',
-                            marginBottom: '30px'
-                        }}>
-                            <tbody>
-                                <tr>
-                                    <td style={{ border: '1px solid black', padding: '10px', width: '70%' }}>
-                                        <strong>Monthly Component</strong>
-                                    </td>
-                                    <td style={{ border: '1px solid black', padding: '10px', width: '30%', textAlign: 'right' }}>
-                                        <strong>Amount (in Rs.)</strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ border: '1px solid black', padding: '10px' }}>
-                                        <strong>Basic</strong>
-                                    </td>
-                                    <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right' }}>
-                                        {data?.basicSalary}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ border: '1px solid black', padding: '10px' }}>
-                                        <strong>Monthly Gross</strong>
-                                    </td>
-                                    <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right' }}>
-                                        {data?.monthlyGross}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ border: '1px solid black', padding: '10px' }}>
-                                        <strong>Annual Gross (Round Off)</strong>
-                                    </td>
-                                    <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right' }}>
-                                        {data?.annualGross}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        {/* OPTION 1: Render the HTML description if available */}
+                        {data?.description && (
+                            <div dangerouslySetInnerHTML={{ __html: data.description }} />
+                        )}
 
-                        {/* Additional Benefits */}
-                        <div style={{ marginBottom: '40px' }}>
-                            <h4 style={{
-                                textDecoration: 'underline',
-                                margin: '0 0 20px 0',
-                                fontSize: '11pt',
-                                fontWeight: 'bold'
-                            }}>
-                                Additional Benefits:
-                            </h4>
-
-                            <div style={{ lineHeight: '2' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>Company's Contribution towards PF (per annum) @ 12%</span>
-                                    <span>Rs. {data?.pfAmount}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>Workmen Compensation Annual Premium</span>
-                                    <span>Rs. {data?.workmenComp || '00.00'}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>Gratuity @ 4.81% of Basic (Per annum) - Notional Pay</span>
-                                    <span>Rs. {data?.gratuity}</span>
-                                </div>
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    marginTop: '20px',
-                                    paddingTop: '10px',
-                                    borderTop: '2px solid black',
-                                    fontWeight: 'bold'
+                        {/* OPTION 2: OR Render dynamic salary table if salaryData exists */}
+                        {!data?.description && hasSalaryBreakup && (
+                            <>
+                                {/* Monthly Salary Table */}
+                                <table style={{
+                                    width: '100%',
+                                    borderCollapse: 'collapse',
+                                    marginBottom: '30px'
                                 }}>
-                                    <span>Total Annual Impact (CTC)</span>
-                                    <span>Rs. {data?.totalCTC}</span>
+                                    <thead>
+                                        <tr style={{ backgroundColor: '#f2f2f2' }}>
+                                            <th style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                textAlign: 'left',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                Monthly Component
+                                            </th>
+                                            <th style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                Amount (in Rs.)
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {/* Basic */}
+                                        <tr>
+                                            <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                                                <strong>Basic</strong>
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                {formatCurrency(salaryData.basic)}
+                                            </td>
+                                        </tr>
+
+                                        {/* HRA */}
+                                        {salaryData.hra > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                                                    <strong>HRA</strong>
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.hra)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Children Hostel AI */}
+                                        {salaryData.childrenHostelAI > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                                                    <strong>Children Hostel AI</strong>
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.childrenHostelAI)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Transport */}
+                                        {salaryData.transport > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                                                    <strong>Transport</strong>
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.transport)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Medical */}
+                                        {salaryData.medical > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                                                    <strong>Medical</strong>
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.medical)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Special */}
+                                        {salaryData.special > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px' }}>
+                                                    <strong>Special</strong>
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.special)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Gross Monthly Row */}
+                                        <tr style={{ backgroundColor: '#e8f4ff' }}>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                <strong>Gross Monthly</strong>
+                                            </td>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                {formatCurrency(salaryData.grossMonthly)}
+                                            </td>
+                                        </tr>
+
+                                        {/* Employer Contributions Section */}
+                                        <tr>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                fontStyle: 'italic'
+                                            }}>
+                                                Employer Contributions:
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '10px' }}></td>
+                                        </tr>
+
+                                        {/* PF Employer */}
+                                        {salaryData.pfEmployer > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', paddingLeft: '20px' }}>
+                                                    PF (Employer) @ 12%
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.pfEmployer)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Gratuity */}
+                                        {salaryData.gratuity > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', paddingLeft: '20px' }}>
+                                                    Gratuity @ 4.81%
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.gratuity)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Employer Benefit (ESIC/Mediclaim/Workmen) */}
+                                        {salaryData.employerBenefitAmount > 0 && (
+                                            <tr>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', paddingLeft: '20px' }}>
+                                                    {salaryData.employerBenefitType === 'esic' ? 'ESIC (Employer)' :
+                                                        salaryData.employerBenefitType === 'mediclaim' ? 'Mediclaim' :
+                                                            salaryData.employerBenefitType === 'workmen' ? 'Workmen Compensation' :
+                                                                salaryData.employerBenefitTitle || 'Other Benefit'}
+                                                </td>
+                                                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'right' }}>
+                                                    {formatCurrency(salaryData.employerBenefitAmount)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* CTC Monthly */}
+                                        <tr style={{ backgroundColor: '#e8ffe8' }}>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                <strong>CTC (Monthly)</strong>
+                                            </td>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                {formatCurrency(salaryData.ctcMonthly)}
+                                            </td>
+                                        </tr>
+
+                                        {/* Reimbursements if any */}
+                                        {salaryData.reimbursementsMonthly > 0 && (
+                                            <tr>
+                                                <td style={{
+                                                    border: '1px solid #ddd',
+                                                    padding: '10px',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    Reimbursements (Monthly):
+                                                </td>
+                                                <td style={{
+                                                    border: '1px solid #ddd',
+                                                    padding: '10px',
+                                                    textAlign: 'right'
+                                                }}>
+                                                    {formatCurrency(salaryData.reimbursementsMonthly)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {/* Total CTO Monthly */}
+                                        <tr style={{ backgroundColor: '#fff0e8', borderTop: '2px solid #ddd' }}>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                fontWeight: 'bold',
+                                                fontSize: '12pt'
+                                            }}>
+                                                <strong>Total CTO (Monthly)</strong>
+                                            </td>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold',
+                                                fontSize: '12pt'
+                                            }}>
+                                                {formatCurrency(salaryData.totalCTOMonthly)}
+                                            </td>
+                                        </tr>
+
+                                        {/* Total CTO Annual */}
+                                        <tr style={{ backgroundColor: '#fff0e8' }}>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                fontWeight: 'bold',
+                                                fontSize: '12pt'
+                                            }}>
+                                                <strong>Total Annual Impact (CTC)</strong>
+                                            </td>
+                                            <td style={{
+                                                border: '1px solid #ddd',
+                                                padding: '10px',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold',
+                                                fontSize: '12pt'
+                                            }}>
+                                                {formatCurrency(salaryData.totalCTOAnnual)}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                {/* Additional Benefits Section */}
+                                <div style={{ marginBottom: '40px' }}>
+                                    <h4 style={{
+                                        textDecoration: 'underline',
+                                        margin: '0 0 20px 0',
+                                        fontSize: '11pt',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        Additional Benefits:
+                                    </h4>
+
+                                    <div style={{ lineHeight: '2' }}>
+                                        {/* PF Annual */}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>Company's Contribution towards PF (per annum) @ 12%</span>
+                                            <span>Rs. {formatCurrency(calculateAnnual(salaryData.pfEmployer))}</span>
+                                        </div>
+
+                                        {/* Employer Benefit Annual */}
+                                        {salaryData.employerBenefitAmount > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>
+                                                    {salaryData.employerBenefitType === 'esic' ? 'ESIC (Employer) Annual Contribution' :
+                                                        salaryData.employerBenefitType === 'mediclaim' ? 'Mediclaim Annual Premium' :
+                                                            salaryData.employerBenefitType === 'workmen' ? 'Workmen Compensation Annual Premium' :
+                                                                (salaryData.employerBenefitTitle || 'Other Employer Benefit') + ' Annual Amount'}
+                                                </span>
+                                                <span>Rs. {formatCurrency(calculateAnnual(salaryData.employerBenefitAmount))}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Gratuity Annual */}
+                                        {salaryData.gratuity > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>Gratuity @ 4.81% of Basic (Per annum) - Notional Pay</span>
+                                                <span>Rs. {formatCurrency(calculateAnnual(salaryData.gratuity))}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Total CTC Annual */}
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginTop: '20px',
+                                            paddingTop: '10px',
+                                            borderTop: '2px solid black',
+                                            fontWeight: 'bold'
+                                        }}>
+                                            <span>Total Annual Impact (CTC)</span>
+                                            <span>Rs. {formatCurrency(salaryData.totalCTOAnnual)}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </>
+                        )}
+
+                        {/* Fallback to static data if no salary breakdown */}
+                        {!data?.description && !hasSalaryBreakup && (
+                            <>
+                                {/* Original static salary table */}
+                                <table style={{
+                                    width: '100%',
+                                    borderCollapse: 'collapse',
+                                    marginBottom: '30px'
+                                }}>
+                                    <tbody>
+                                        <tr>
+                                            <td style={{ border: '1px solid black', padding: '10px', width: '70%' }}>
+                                                <strong>Monthly Component</strong>
+                                            </td>
+                                            <td style={{ border: '1px solid black', padding: '10px', width: '30%', textAlign: 'right' }}>
+                                                <strong>Amount (in Rs.)</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black', padding: '10px' }}>
+                                                <strong>Basic</strong>
+                                            </td>
+                                            <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right' }}>
+                                                {data?.basicSalary || '0'}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black', padding: '10px' }}>
+                                                <strong>Monthly Gross</strong>
+                                            </td>
+                                            <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right' }}>
+                                                {data?.monthlyGross || '0'}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black', padding: '10px' }}>
+                                                <strong>Annual Gross (Round Off)</strong>
+                                            </td>
+                                            <td style={{ border: '1px solid black', padding: '10px', textAlign: 'right' }}>
+                                                {data?.annualGross || '0'}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                {/* Original Additional Benefits */}
+                                <div style={{ marginBottom: '40px' }}>
+                                    <h4 style={{
+                                        textDecoration: 'underline',
+                                        margin: '0 0 20px 0',
+                                        fontSize: '11pt',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        Additional Benefits:
+                                    </h4>
+
+                                    <div style={{ lineHeight: '2' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>Company's Contribution towards PF (per annum) @ 12%</span>
+                                            <span>Rs. {data?.pfAmount || '00.00'}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>Workmen Compensation Annual Premium</span>
+                                            <span>Rs. {data?.workmenComp || '00.00'}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>Gratuity @ 4.81% of Basic (Per annum) - Notional Pay</span>
+                                            <span>Rs. {data?.gratuity || '00.00'}</span>
+                                        </div>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginTop: '20px',
+                                            paddingTop: '10px',
+                                            borderTop: '2px solid black',
+                                            fontWeight: 'bold'
+                                        }}>
+                                            <span>Total Annual Impact (CTC)</span>
+                                            <span>Rs. {data?.totalCTC || '0'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
                         {/* Annexure Signatory */}
                         <div style={{ marginTop: '60px' }}>

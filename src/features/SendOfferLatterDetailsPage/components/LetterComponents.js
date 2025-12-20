@@ -29,7 +29,7 @@ export const letterStyles = {
         display: 'table',
         margin: '0 auto',
         boxSizing: 'border-box',
-        fontFamily: '"Times New Roman", Times, serif',
+        fontFamily: '"Arial, sans-serif',
         fontSize: '11pt',
         lineHeight: '1.5',
         color: '#000',
@@ -39,7 +39,7 @@ export const letterStyles = {
     center: { textAlign: 'center', paddingTop: 25 },
     justify: { textAlign: 'justify' },
     table: { width: '100%', borderCollapse: 'collapse', margin: '15px 0' },
-    td: { padding: '6px' },
+    td: { padding: '6px', fontFamily: 'Arial, sans-serif', fontSize: '8px' },
     th: { padding: '6px', backgroundColor: '#f9f9f9', textAlign: 'left' },
     signatureRow: {
         display: 'flex',
@@ -226,22 +226,42 @@ export const EmployeeSignature = ({ employeeName, designation }) => {
 // Witness Signature Component
 export const WitnessSignature = ({ witnessNumber = 1 }) => {
     return (
-        <div style={{
-            textAlign: 'left',
-            marginTop: '20px'
-        }}>
-            <p style={{
-                margin: '0 0 5px 0',
-                fontSize: '11pt',
-                fontFamily: "'Times New Roman', Times, serif",
-                textDecoration: 'underline'
-            }}>
+        <div
+            style={{
+                display: 'inline-block',
+                textAlign: 'left',
+                marginTop: '20px',
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '8px',
+            }}
+        >
+            <p
+                style={{
+                    margin: '0 0 5px 0',
+                    fontSize: '8px',
+                    textDecoration: 'underline',
+                    textAlign: 'center'
+                }}
+            >
                 Witness {witnessNumber}
             </p>
-            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Signature: __________________</p>
-            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Name: __________________</p>
-            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Address: __________________</p>
-            <p style={{ margin: '5px 0', fontSize: '10pt' }}>Dated: __________________</p>
+
+            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+                Signature: __________________
+            </p>
+
+            {/* Name line – font size 10 */}
+            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+                Name: __________________
+            </p>
+
+            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+                Address: __________________
+            </p>
+
+            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+                Dated: __________________
+            </p>
         </div>
     );
 };

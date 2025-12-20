@@ -1,9 +1,9 @@
 // TemplatePreviewPage.jsx - Simplified Print Only Version
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import config from '../../config/config';
-import { apiHeaderToken } from '../../config/api_header';
+import { apiHeaderToken, apiHeaderTokenMultiPart } from '../../config/api_header';
 import { Container, Row, Col, Button, Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { BiArrowBack, BiPrinter } from 'react-icons/bi';
@@ -11,6 +11,10 @@ import { BiArrowBack, BiPrinter } from 'react-icons/bi';
 // Import templates
 import { ConsultantLetter } from './ConsultantLetterTemp';
 import { AppointmentLetter } from './AppointmentLetterTemp';
+import { GetEmployeeListDropDownScroll } from '../slices/EmployeeSlices/EmployeeSlice';
+import { useDispatch } from 'react-redux';
+import SalaryBreakupModal from './SalaryCalculationModal';
+import { numberToWords } from '../../utils/common';
 
 // Date formatting helper functions
 export const formatDate = (dateString) => {
@@ -55,16 +59,229 @@ const TemplatePreviewPage = () => {
     const [candidateData, setCandidateData] = useState(null);
     const [templateData, setTemplateData] = useState({});
     const [webSettingData, setWebSettingData] = useState(null);
-
+    const [salaryOpen, setSalaryOpen] = useState(false);
+    const [totalSalaryBreakup, setTotalSalaryBreakup] = useState(null);
+    const [salaryUpdateTrigger, setSalaryUpdateTrigger] = useState(0);
+    const [salaryConfirmed, setSalaryConfirmed] = useState(false);
+    const [description, setDescription] = useState('');
     const templateType = searchParams.get('type') || 'offer';
     const templateRef = useRef(null);
+    const dispatch = useDispatch()
+    const handleSalarySave = (data) => {
+        setTotalSalaryBreakup({ ...data });
+        setSalaryUpdateTrigger(prev => prev + 1);
+        setSalaryConfirmed(true);
+        setSalaryOpen(false);
+        toast.success("Salary structure saved successfully!");
+    };
+    const jobTypeLower = candidateData?.job_type || '';
 
+    // Show Salary Structure button for both "On Role" and "Consultant" types
+    const showSalaryStructureBtn =
+        jobTypeLower === 'OnRole' ||
+        jobTypeLower === 'OnContract'
+
+    const formatMoney = useCallback((v) => {
+        const n = Number(v);
+        const value = Number.isFinite(n) ? n : 0;
+        return value.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+    }, []);
+    const generateSalaryTableHtml = useCallback((salaryData, formatMoney) => {
+        if (!salaryData) return '';
+
+        let rowsHtml = '';
+
+        if (salaryData.isEmpanelledOrConsultant) return '';
+
+        const addRow = (component, value, suffix = '') => {
+            if (value > 0) {
+                rowsHtml += `
+                <tr style="background:#fff;font-weight:400;">
+                    <td style="padding:10px 12px;font-weight:400;border:1px solid #dddddd;">${component}</td>
+                    <td style="min-width:160px;padding:10px 12px;text-align:right;font-weight:400;border:1px solid #dddddd;">${Number(value).toFixed(0)} ${suffix}</td>
+                </tr>
+      `;
+            }
+        };
+
+        addRow('Basic', salaryData.basic);
+        addRow('HRA', salaryData.hra);
+        addRow('Children AI', salaryData.childrenHostelAI);
+        addRow('Transport', salaryData.transport);
+        addRow('Medical', salaryData.medical);
+        addRow('Special', salaryData.special);
+        addRow('Gross Monthly', salaryData.grossMonthly);
+
+        if (salaryData.isEmpanelledOrConsultant) addRow('Monthly Salary / Per Visit', salaryData.monthlySalary);
+        if (salaryData.isEmpanelledOrConsultant) addRow('TDS Percentage', salaryData.tdsPercent);
+        if (salaryData.isEmpanelledOrConsultant) addRow('TDS Amount', salaryData.tds);
+        if (salaryData.isEmpanelledOrConsultant) addRow('Gross', salaryData.takeHomeMonthly);
+
+        // Employer Contributions
+        // employer benefit (could be ESIC / Mediclaim / Workmen / Others)
+        if (salaryData && Number(salaryData.employerBenefitAmount) > 0) {
+            const t = salaryData.employerBenefitType || 'others';
+            const label = t === 'esic' ? 'ESIC (Employer)' : t === 'mediclaim' ? 'Mediclaim' : t === 'workmen' ? 'Workmen Compensation' : (salaryData.employerBenefitTitle || 'Other Benefit');
+            addRow(label, salaryData.employerBenefitAmount);
+        }
+        addRow('Gratuity', salaryData.gratuity);
+        addRow('PF (Employer)', salaryData.pfEmployer);
+        // addRow('Take Home', salaryData.takeHomeMonthly);
+        addRow('CTC (Monthly)', salaryData.ctcMonthly);
+        // Reimbursements
+        addRow('Reimbursements (Monthly)', salaryData.reimbursementsMonthly);
+        addRow('Reimbursements (Annual)', salaryData.reimbursementsAnnual);
+
+        // Totals
+        addRow('Total CTO (Monthly)', salaryData.totalCTOMonthly);
+        addRow('Annual Gross', salaryData.totalCTOAnnual, '(Round Off)');
+
+        let headerHtml
+
+        if (salaryData.isEmpanelledOrConsultant) {
+            headerHtml = ``;
+        } else {
+            headerHtml = `
+            <thead>
+                <tr style="background:#f2f2f2;font-weight:600;">
+                    <th scope="col" style="text-align:left;padding:10px 12px;border:1px solid #dddddd;">Monthly Component</th>
+                    <th scope="col" style="text-align:right;padding:10px 12px;min-width:160px;border:1px solid #dddddd;">Amount (in Rs.)</th>
+                </tr>
+            </thead>
+        `;
+        }
+
+
+
+        return `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; border:1px solid #dddddd;">
+                ${headerHtml}
+                <tbody>
+                ${rowsHtml}
+                </tbody>
+            </table>
+        `;
+    }, []);
+    const generateAdditionalBenefitsHtml = useCallback((salaryData, formatMoney) => {
+        if (!salaryData) return '';
+        const pfPercent = (salaryData && salaryData.basic && salaryData.pfEmployer) ? ((Number(salaryData.pfEmployer) / Number(salaryData.basic) * 100).toFixed(2)) : '12';
+        const pfAnnual = formatMoney((Number(salaryData.pfEmployer) || 0) * 12);
+
+        let employerBenefitHtml = '';
+        const ebAmt = Number(salaryData?.employerBenefitAmount) || 0;
+        const ebType = salaryData?.employerBenefitType || '';
+        const ebTitle = salaryData?.employerBenefitTitle || '';
+        if (ebAmt > 0) {
+            const ann = formatMoney(ebAmt * 12);
+            if (ebType === 'esic') employerBenefitHtml = `<li>ESIC (Employer) Annual Contribution…………………........................................ Rs. ${ann}</li>`;
+            else if (ebType === 'mediclaim') employerBenefitHtml = `<li>Mediclaim Annual Premium…………………........................................ Rs. ${ann}</li>`;
+            else if (ebType === 'workmen') employerBenefitHtml = `<li>Workmen Compensation Annual Premium…………………........................................ Rs. ${ann}</li>`;
+            else employerBenefitHtml = `<li>${ebTitle || 'Other Employer Benefit'} Annual Amount…………………........................................ Rs. ${ann}</li>`;
+        }
+
+        const gratuityPercent = (salaryData && salaryData.basic && salaryData.gratuity) ? ((Number(salaryData.gratuity) / Number(salaryData.basic) * 100).toFixed(2)) : '0.00';
+        const gratuityAnnual = formatMoney((Number(salaryData.gratuity) || 0) * 12);
+
+        // Check if empanelled/consultant for different Additional Benefits display
+        if (salaryData.isEmpanelledOrConsultant) {
+            return `
+                            <div style="">
+                                <span>
+                                    <p style="font-style: bold; font-weight: bold;">Consultancy fee</p>
+                                    <p>The party shall be paid a consultancy fee of Rs. ${salaryData.monthlySalary}/- (${numberToWords(salaryData.monthlySalary)}) per day/month against submission of invoice and Time Sheet. The month being defined as minimum of ----- working days per calendar month.</p>
+                                    <p style="font-style: bold; font-weight: bold;">TDS</p>
+                                    <p>The Trust shall deduct income tax at source (TDS) as per Income Tax Act, which shall be deposited from the remuneration of the Party.</p>
+                                </span>
+                            </div>
+                `;
+        } else {
+            return `
+                    <div class="additional-benefits">
+                        <div style="margin-top:20px;">
+                            <h4 style="margin:0 0 10px 0;">Additional Benefits:</h4>
+                            <div style="">
+                                <ul style="margin:0;padding-left:18px;">
+                                    <li>Company's Contribution towards PF (per annum) @ ${pfPercent}% … Rs. ${pfAnnual}</li>
+                                    ${employerBenefitHtml}
+                                    <li>Gratuity @ ${gratuityPercent || '4.81'}% of Basic (Per annum) - Notional Pay … Rs. ${gratuityAnnual}</li>
+                                    <li>Total Annual Impact (CTC) … Rs. ${formatMoney(salaryData.totalCTOAnnual)}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+    }, []);
+    useEffect(() => {
+        if (!totalSalaryBreakup) return;
+        if (totalSalaryBreakup) {
+            const salaryTableHtml = generateSalaryTableHtml(totalSalaryBreakup, formatMoney);
+            const addlHtml = generateAdditionalBenefitsHtml(totalSalaryBreakup, formatMoney);
+            setDescription(prevDescription => {
+                let prev = prevDescription || '';
+
+                // First, handle tokens if present
+                const hasSalaryToken = prev.includes('{#salary_structure}');
+                const hasBenefitsToken = prev.includes('{#additional_benefits}');
+                if (hasSalaryToken) prev = prev.replace('{#salary_structure}', salaryTableHtml);
+                if (hasBenefitsToken) prev = prev.replace('{#additional_benefits}', addlHtml);
+
+                // If tokens handled both, return immediately
+                if (hasSalaryToken || hasBenefitsToken) return prev;
+
+                // Otherwise, replace existing table/figure or append salary table
+                const figureTableRegex = /<figure[^>]*class=["']?table["']?[^>]*>[\s\S]*?<\/figure>/i;
+                const tableBlockRegex = /<table[^>]*>[\s\S]*?<\/table>/i;
+                if (figureTableRegex.test(prev)) {
+                    prev = prev.replace(figureTableRegex, salaryTableHtml);
+                } else if (tableBlockRegex.test(prev)) {
+                    prev = prev.replace(tableBlockRegex, salaryTableHtml);
+                } else {
+                    prev = prev + salaryTableHtml;
+                }
+
+                // Handle Additional Benefits placement/update
+                const addlDivFirst = /<div[^>]*class=["']additional-benefits["'][^>]*>[\s\S]*?<\/div>/i;
+                const addlDivAll = /<div[^>]*class=["']additional-benefits["'][^>]*>[\s\S]*?<\/div>/gi;
+                const legacyBlock = /<h[46][^>]*>\s*Additional\s+Benefits:\s*<\/h[46]>\s*(<div[^>]*>[\s\S]*?<\/div>\s*)?(<ul[\s\S]*?<\/ul>)/i;
+                const legacyBlockAll = /<h[46][^>]*>\s*Additional\s+Benefits:\s*<\/h[46]>\s*(<div[^>]*>[\s\S]*?<\/div>\s*)?(<ul[\s\S]*?<\/ul>)/gi;
+                if (addlDivFirst.test(prev)) {
+                    // Replace first managed block and drop any duplicates
+                    let replaced = false;
+                    prev = prev.replace(addlDivAll, () => {
+                        if (!replaced) { replaced = true; return addlHtml; }
+                        return '';
+                    });
+                    // Also remove legacy duplicates if any remain
+                    prev = prev.replace(legacyBlockAll, '');
+                } else if (legacyBlock.test(prev)) {
+                    // Replace legacy h4/ul block with managed block
+                    prev = prev.replace(legacyBlock, addlHtml);
+                    // Remove any further legacy duplicates
+                    prev = prev.replace(legacyBlockAll, '');
+                } else {
+                    // No managed or legacy block -> append
+                    prev = prev + addlHtml;
+                }
+                return prev;
+            });
+        } else {
+            setDescription(prevDescription => {
+                const newDescription = stripAdditionalBenefits(prevDescription || '')
+                    .replace(/<table[^>]*>[\s\S]*?<\/table>/g, '')
+                    .replace('{#salary_structure}', '')
+                    .replace('{#additional_benefits}', '');
+                return newDescription;
+            });
+        }
+    }, [salaryUpdateTrigger, generateSalaryTableHtml, generateAdditionalBenefitsHtml, formatMoney, totalSalaryBreakup])
     // Fetch web settings
     useEffect(() => {
         const getConfigData = async () => {
             try {
                 let response = await axios.get(`${config.API_URL}getAllSettingData`, apiHeaderToken(config.API_TOKEN));
                 if (response.status === 200) {
+                    console.log("websetting", response?.data?.data)
                     setWebSettingData(response?.data?.data);
                 }
             } catch (error) {
@@ -73,7 +290,56 @@ const TemplatePreviewPage = () => {
         };
         getConfigData();
     }, []);
+    // Dedicated generator for Additional Benefits block (outside the table)
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 800, // md size (600px)
+        maxWidth: '95vw',
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        borderRadius: 2,
+        p: 4,
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        // position: 'relative'
+    };
 
+    // Remove any existing Additional Benefits sections from rich text
+    const stripAdditionalBenefits = useCallback((html) => {
+        if (!html) return '';
+        let out = html;
+        // Remove our wrapped block
+        out = out.replace(/<div[^>]*class=("|')additional-benefits\1[\s\S]*?<\/div>\s*/gi, '');
+        // Remove pattern: <p>Additional Benefits:</p><ul>...</ul>
+        out = out.replace(/<p[^>]*>\s*Additional\s+Benefits:\s*<\/p>\s*(<ul[\s\S]*?<\/ul>)?/gi, '');
+        // Remove pattern: <h6>/<h4> Additional Benefits followed by common containers
+        out = out.replace(/<h6[^>]*>\s*Additional\s+Benefits:\s*<\/h6>\s*((<div[\s\S]*?<\/div>)|(<ul[\s\S]*?<\/ul>)|((<p[\s\S]*?<\/p>){1,10}))/gi, '');
+        out = out.replace(/<h4[^>]*>\s*Additional\s+Benefits:\s*<\/h4>\s*((<div[\s\S]*?<\/div>)|(<ul[\s\S]*?<\/ul>)|((<p[\s\S]*?<\/p>){1,10}))/gi, '');
+        // Remove any ULs that contain known Additional Benefits lines even without a heading
+        out = out.replace(/<ul[^>]*>[\s\S]*?(Company\'s\s+Contribution\s+towards\s+PF|ESIC\s*\(Employer\)|Gratuity\s*@)[\s\S]*?<\/ul>/gi, '');
+        return out;
+    }, []);
+    const EmployeeListDropDownPagination = async (inputValue, loadedOptions, { page }) => {
+
+        let payloads = {
+            "keyword": inputValue,
+            "page_no": page.toString(),
+            "per_page_record": "10",
+            "scope_fields": ["employee_code", "name", "email", "mobile_no", "_id", 'designation'],
+            "profile_status": "Active",
+        }
+
+        const result = await dispatch(GetEmployeeListDropDownScroll(payloads)).unwrap();
+
+        return {
+            options: result,
+            hasMore: result.length >= 10,
+            additional: { page: page + 1 }
+        };
+    };
     // Fetch candidate and approval data
     useEffect(() => {
         const fetchData = async () => {
@@ -118,12 +384,13 @@ const TemplatePreviewPage = () => {
 
     useEffect(() => {
         if (candidateData && approvalData && webSettingData) {
-            const templateData = prepareTemplateData(candidateData, approvalData);
+            const templateData = prepareTemplateData(candidateData, approvalData, totalSalaryBreakup);
             setTemplateData(templateData);
         }
-    }, [candidateData, approvalData, webSettingData]);
+    }, [candidateData, approvalData, webSettingData, totalSalaryBreakup]); // Add totalSalaryBreakup dependency
 
-    const prepareTemplateData = (candidate, approval) => {
+    // In TemplatePreviewPage.jsx
+    const prepareTemplateData = (candidate, approval, salaryBreakup = null) => {
         const currentDate = getCurrentDate();
 
         // Determine template type based on job_type and job_designation
@@ -159,51 +426,90 @@ const TemplatePreviewPage = () => {
             mprOfferType: approval.mpr_offer_type || '',
             mprFundType: approval.mpr_fund_type || '',
             addByDetails: approval.add_by_details || {},
-            ecNumber: approval.ec_number || ''
+            ecNumber: approval.ec_number || '',
+
+            // Add salary breakdown data if available
+            salaryBreakup: salaryBreakup || null,
+            isConsultant: isConsultant
         };
 
-        if (isConsultant) {
-            const feeAmount = candidate.offer_ctc || 0;
-            const workingDays = candidate.working_days || 26;
-            const dailyRate = Math.round(feeAmount / (workingDays * 12));
+        // If salary breakdown is provided, use those values
+        if (salaryBreakup) {
+            if (isConsultant) {
+                const feeAmount = salaryBreakup.monthlySalary || candidate.offer_ctc || 0;
+                return {
+                    ...baseData,
+                    feeAmount: feeAmount.toString(),
+                    feeAmountWords: convertToWords(feeAmount),
+                    workingDays: candidate.working_days || '26',
+                    dailyRate: Math.round(feeAmount / (26 * 12)).toString(),
+                    probationPeriod: 'N/A',
+                    totalCTC: feeAmount.toString(),
+                    salaryBreakup: salaryBreakup
+                };
+            } else {
+                const annualGross = salaryBreakup.totalCTOAnnual || candidate.offer_ctc || 0;
+                const monthlyGross = salaryBreakup.totalCTOMonthly || Math.round((candidate.offer_ctc || 0) / 12);
+                const basicSalary = salaryBreakup.basic || Math.round((candidate.offer_ctc || 0) * 0.4);
 
-            return {
-                ...baseData,
-                feeAmount: feeAmount.toString(),
-                feeAmountWords: convertToWords(feeAmount),
-                workingDays: workingDays.toString(),
-                dailyRate: dailyRate.toString(),
-                probationPeriod: 'N/A',
-                annualGrossSalary: '0',
-                annualGrossSalaryWords: 'Zero',
-                basicSalary: '0',
-                monthlyGross: '0',
-                annualGross: '0',
-                pfAmount: '0',
-                workmenComp: '0',
-                gratuity: '0',
-                totalCTC: feeAmount.toString(),
-                isConsultant: true
-            };
+                return {
+                    ...baseData,
+                    probationPeriod: candidate.probation_period || 'Six months',
+                    annualGrossSalary: annualGross.toString(),
+                    annualGrossSalaryWords: convertToWords(annualGross),
+                    basicSalary: basicSalary.toString(),
+                    monthlyGross: monthlyGross.toString(),
+                    annualGross: annualGross.toString(),
+                    pfAmount: salaryBreakup.pfEmployer || calculatePF(basicSalary).toString(),
+                    workmenComp: salaryBreakup.workmenComp || calculateWorkmenComp(annualGross).toString(),
+                    gratuity: salaryBreakup.gratuity || calculateGratuity(basicSalary).toString(),
+                    totalCTC: annualGross.toString(),
+                    salaryBreakup: salaryBreakup
+                };
+            }
         } else {
-            const basicSalary = Math.round((candidate.offer_ctc || 0) * 0.4);
-            const monthlyGross = Math.round((candidate.offer_ctc || 0) / 12);
-            const annualGross = candidate.offer_ctc || 0;
+            // Original logic without salary breakdown
+            if (isConsultant) {
+                const feeAmount = candidate.offer_ctc || 0;
+                const workingDays = candidate.working_days || 26;
+                const dailyRate = Math.round(feeAmount / (workingDays * 12));
 
-            return {
-                ...baseData,
-                probationPeriod: candidate.probation_period || 'Six months',
-                annualGrossSalary: annualGross.toString(),
-                annualGrossSalaryWords: convertToWords(annualGross),
-                basicSalary: basicSalary.toString(),
-                monthlyGross: monthlyGross.toString(),
-                annualGross: annualGross.toString(),
-                pfAmount: calculatePF(basicSalary).toString(),
-                workmenComp: calculateWorkmenComp(annualGross).toString(),
-                gratuity: calculateGratuity(basicSalary).toString(),
-                totalCTC: candidate.offer_ctc ? candidate.offer_ctc.toString() : '0',
-                isConsultant: false
-            };
+                return {
+                    ...baseData,
+                    feeAmount: feeAmount.toString(),
+                    feeAmountWords: convertToWords(feeAmount),
+                    workingDays: workingDays.toString(),
+                    dailyRate: dailyRate.toString(),
+                    probationPeriod: 'N/A',
+                    annualGrossSalary: '0',
+                    annualGrossSalaryWords: 'Zero',
+                    basicSalary: '0',
+                    monthlyGross: '0',
+                    annualGross: '0',
+                    pfAmount: '0',
+                    workmenComp: '0',
+                    gratuity: '0',
+                    totalCTC: feeAmount.toString()
+                };
+            } else {
+                const basicSalary = Math.round((candidate.offer_ctc || 0) * 0.4);
+                const monthlyGross = Math.round((candidate.offer_ctc || 0) / 12);
+                const annualGross = candidate.offer_ctc || 0;
+
+                return {
+                    ...baseData,
+                    probationPeriod: candidate.probation_period || 'Six months',
+                    annualGrossSalary: annualGross.toString(),
+                    annualGrossSalaryWords: convertToWords(annualGross),
+                    basicSalary: basicSalary.toString(),
+                    monthlyGross: monthlyGross.toString(),
+                    annualGross: annualGross.toString(),
+                    pfAmount: calculatePF(basicSalary).toString(),
+                    workmenComp: calculateWorkmenComp(annualGross).toString(),
+                    gratuity: calculateGratuity(basicSalary).toString(),
+                    totalCTC: candidate.offer_ctc ? candidate.offer_ctc.toString() : '0'
+                };
+            }
         }
     };
 
@@ -230,7 +536,83 @@ const TemplatePreviewPage = () => {
 
         return str.trim() + ' Rupees Only';
     };
+    const handleSend = async (event) => {
+        event?.preventDefault();
 
+        if (!salaryConfirmed) {
+            toast.warning("Please confirm the salary structure before generating the letter.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const loginUsers = JSON.parse(localStorage.getItem('admin_role_user')) || {};
+            const isApproved = candidateData?.appointment_letter_verification_status?.status === 'Complete' ||
+                candidateData?.document_status?.status === 'approved';
+
+            let url = '';
+            let payload = {};
+            let isMultipart = false;
+            let headers = apiHeaderToken(config.API_TOKEN);
+
+            const basePayload = {
+                candidate_doc_id: candidateId,
+                approval_note_doc_id: approvalId,
+                add_by_name: loginUsers?.name || '',
+                add_by_designation: loginUsers?.designation || '',
+                add_by_mobile: loginUsers?.mobile_no || '',
+                add_by_email: loginUsers?.email || '',
+            };
+
+            // For Appointment Letter after approval
+            if (templateType === 'appointment' && isApproved) {
+                url = `${config.API_URL}sendAppointmentLetterToCandidateAfterApproval`;
+                payload = {
+                    ...basePayload,
+                    email_subject: `Appointment Letter - ${candidateData?.name}`,
+                };
+            }
+            // Default: Generate & send offer/appointment letter (with salary structure)
+            else {
+                url = `${config.API_URL}send_approval_mail`;
+                const formData = new FormData();
+
+                formData.append("contents", description);
+                formData.append("approval_note_id", approvalId);
+                formData.append("candidate_id", candidateId);
+                formData.append("email_subject", `Appointment Letter - ${candidateData?.name}`);
+                formData.append("add_by_name", loginUsers?.name || '');
+                formData.append("add_by_mobile", loginUsers?.mobile_no || '');
+                formData.append("add_by_designation", loginUsers?.designation || '');
+                formData.append("add_by_email", loginUsers?.email || '');
+
+                // Attach salary structure if confirmed
+                if (totalSalaryBreakup) {
+                    formData.append('salary_structure', JSON.stringify(totalSalaryBreakup));
+                }
+
+                payload = formData;
+                isMultipart = true;
+                headers = { ...apiHeaderTokenMultiPart(config.API_TOKEN) };
+            }
+
+            const response = await axios.post(url, payload, headers);
+
+            if (response.status === 200) {
+                toast.success(response.data?.message || "Letter generated and sent successfully!");
+                // Optional: navigate back after success
+                // navigate(-1);
+            } else {
+                toast.error(response.data?.message || "Failed to send letter");
+            }
+        } catch (error) {
+            console.error("Error in handleSend:", error);
+            toast.error(error?.response?.data?.message || "Failed to generate/send letter");
+        } finally {
+            setLoading(false);
+        }
+    };
     const calculatePF = (basic) => basic ? Math.round((basic * 12) / 100) : 0;
     const calculateGratuity = (basic) => basic ? Math.round((basic * 12 * 4.81) / 100) : 0;
     const calculateWorkmenComp = (annualGross) => annualGross ? Math.round(annualGross * 0.02) : 0;
@@ -329,10 +711,9 @@ const TemplatePreviewPage = () => {
             </style>
 
             <Container fluid className="py-4 no-print">
-                {/* Header with navigation and actions - Hidden during print */}
-                <Row className="mb-4">
+                <Row className="mb-4 align-items-center">
                     <Col>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
+                        <div className="d-flex justify-content-between align-items-center">
                             <Button
                                 variant="outline-primary"
                                 onClick={() => navigate(-1)}
@@ -342,7 +723,38 @@ const TemplatePreviewPage = () => {
                                 Back to Approval
                             </Button>
 
-                            <div className="d-flex gap-3">
+                            <div className="d-flex gap-3 align-items-center">
+                                {/* Salary Structure Button - Only for On Role */}
+                                {showSalaryStructureBtn && (
+                                    <Button
+                                        variant="outline-secondary"
+                                        onClick={() => setSalaryOpen(true)}
+                                        disabled={loading}
+                                    >
+                                        Salary Structure
+                                    </Button>
+                                )}
+
+                                {/* Generate Button - Only shown after salary confirmed */}
+                                {showSalaryStructureBtn && salaryConfirmed && (
+                                    <Button
+                                        variant="success"
+                                        onClick={handleSend}
+                                        disabled={loading}
+                                        className="d-flex align-items-center"
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Spinner animation="border" size="sm" className="me-2" />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            'Generate & Send'
+                                        )}
+                                    </Button>
+                                )}
+
+                                {/* Print Button - Always available */}
                                 <Button
                                     variant="primary"
                                     onClick={handlePrint}
@@ -357,12 +769,30 @@ const TemplatePreviewPage = () => {
                 </Row>
             </Container>
 
-            {/* Template Preview - Only this content will print */}
+            {/* Salary Modal */}
+            {templateType === 'appointment' && showSalaryStructureBtn && (
+                <SalaryBreakupModal
+                    show={salaryOpen}
+                    onHide={() => setSalaryOpen(false)}
+                    offer_ctc={candidateData?.offer_ctc}
+                    payment_type={candidateData?.payment_type}
+                    initialValues={totalSalaryBreakup || {}}
+                    saveDataToValue={handleSalarySave}
+                    candidate_details={candidateData}
+                />
+            )}
+
+            {/* Template Preview */}
             <div ref={templateRef} className="print-content">
                 {isConsultant ? (
                     <ConsultantLetter data={templateData} />
                 ) : (
-                    <AppointmentLetter data={templateData} />
+                    <AppointmentLetter
+                        data={{
+                            ...templateData,
+                            description: description, // Pass updated HTML with salary table
+                        }}
+                    />
                 )}
             </div>
         </div>

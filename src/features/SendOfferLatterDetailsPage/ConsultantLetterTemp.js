@@ -27,6 +27,7 @@ const pageStyle = {
 export const ConsultantLetter = ({ data }) => {
     const currentDate = data?.currentDate || getCurrentDate();
     const footerColor = data.webSettingData?.footer_color || '#3caf40';
+    console.log("contract", data)
     return (
         <div style={letterStyles.page}>
             {/* Watermark */}
@@ -37,30 +38,28 @@ export const ConsultantLetter = ({ data }) => {
 
             {/* Title */}
             <div style={letterStyles.center}>
-                <h2 style={{ margin: '20px 0 10px 0', fontSize: '14pt' }}>
+                <h2 style={{ margin: '20px 0 10px 0', fontSize: '10pt', fontFamily: 'Arial, sans-serif', }}>
                     Terms of Contract for Appointment as
                 </h2>
-                <h2 style={{ margin: '0 0 20px 0', fontSize: '14pt', textDecoration: 'underline', }}>{data?.designation}</h2>
+                <h2 style={{ margin: '0 0 20px 0', fontSize: '10pt', textDecoration: 'underline', fontFamily: 'Arial, sans-serif' }}>{data?.designation}</h2>
             </div>
 
             {/* Main Content */}
             <div style={letterStyles.justify}>
                 <p style={{ marginBottom: '20px' }}>
-                    <strong>ARTICLES OF AGREEMENT</strong> made this day, the <span style={{ paddingRight: '5px' }}> {data?.joiningDate} </span> between {data?.employeeName}
-                    resident of {data?.relativeName}, At- {data?.address},
-                    hereinafter called the Party, of the one part and the <strong>Hindustan Latex
-                        Family Planning Promotion Trust (HLFPPT)</strong> B-14 A, IInd Floor, Sector - 62, Gautam Budh
-                    Nagar, Noida-201301, hereinafter called the Trust, of the other part.
+                    Articles of Agreement made this day, the <span style={{ paddingRight: '5px' }}> {data?.joiningDate} </span> between {data?.employeeName}
+                    resident of {data?.relativeName}, At- {data?.address},here in after called the Party, of the one part and the <strong>Hindustan Latex
+                        Family Planning Promotion Trust (HLFPPT)</strong> {data?.webSettingData?.office_address}, hereinafter called the Trust, of the other part.
                 </p>
 
                 <p style={{ marginBottom: '20px' }}>
-                    WHEREAS the Trust has engaged the Party as <strong>Consultant</strong>, on contract basis
+                    WHERE AS the Trust has engaged the Party as <strong>Consultant</strong>, on contract basis
                     and Party has agreed to serve the Trust in that capacity on the terms and conditions
-                    hereinafter contained.
+                    here in after contained.
                 </p>
 
                 <p style={{ marginBottom: '30px' }}>
-                    <strong>NOW THESE PRESENT WITNESS AND THE Parties hereto respectively agree as follows: -</strong>
+                    <strong>NOW THESE PRESENT WITNESS AND THE Parties here to respectively agree as follows: -</strong>
                 </p>
 
                 <ol style={{ paddingLeft: '20px', marginBottom: '20px' }}>
@@ -69,13 +68,13 @@ export const ConsultantLetter = ({ data }) => {
                         The party of the first part shall remain in the service of the Trust as
                         <strong> Consultant</strong> from <span style={{ paddingRight: '5px' }}>{data?.joiningDate} </span> to
                         {data?.contractExpiryDate} or till the completion of the project
-                        whichever is earlier (hereinafter called 'contractual period') subject to the
-                        provisions herein contained.
+                        which ever is earlier (here in after called 'contractual period') subject to the
+                        provisions here in contained.
                     </li>
 
                     <li style={{ marginBottom: '10px' }}>
                         The Party has agreed to perform duties as per the job description set out in
-                        <strong> Appendix - I</strong> hereto, which shall constitute an integral part of
+                        <strong> Appendix - I</strong> here to, which shall constitute an integral part of
                         this Agreement.
                     </li>
 
@@ -130,7 +129,7 @@ export const ConsultantLetter = ({ data }) => {
 
                 <div style={letterStyles.justify}>
                     <ol start="8">
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '10px', paddingTop: '45px' }}>
                             The party acknowledges that in the course of its operations, HLFPPT has developed and
                             gathered extensive data, information, procedures, processes methods and system of a
                             confidential and proprietary nature including, without limitation, information or
@@ -168,13 +167,13 @@ export const ConsultantLetter = ({ data }) => {
                         </li>
                     </ol>
 
-                    <p style={{ marginBottom: '40px' }}>
-                        In witness thereof, the Party and the authorized signatory of the Trust have hereunto set
+                    <p style={{ marginBottom: '20px' }}>
+                        In witness there of, the Party and the authorized signatory of the Trust have hereunto set
                         their hands the day and year first above written.
                     </p>
 
                     {/* Signatures Table */}
-                    <table style={{ ...letterStyles.table, marginTop: '40px' }}>
+                    <table style={{ ...letterStyles.table, marginTop: '40px', fontFamily: 'Arial, sans-serif', fontSize: '8px' }}>
                         <tbody>
                             <tr>
                                 <td colSpan={2} style={{ ...letterStyles.td, textAlign: 'center', fontWeight: 'bold' }}>
@@ -190,7 +189,7 @@ export const ConsultantLetter = ({ data }) => {
                                     <img
                                         src={config.IMAGE_PATH + data?.webSettingData?.hod_hr_signature}
                                         alt="HR Signature"
-                                        style={{ width: '120px', height: '50px', objectFit: 'contain' }}
+                                        style={{ width: '120px', height: '40px', objectFit: 'contain' }}
                                     />
                                 </td>
                                 <td style={letterStyles.td}></td>
@@ -199,9 +198,9 @@ export const ConsultantLetter = ({ data }) => {
                             </tr>
                             <tr>
                                 <td style={letterStyles.td}>Name:</td>
-                                <td style={letterStyles.td}><strong>Awanish Awasthi</strong></td>
+                                <td style={{ ...letterStyles.td, fontSize: '10px' }}><strong>Awanish Awasthi</strong></td>
                                 <td style={letterStyles.td}>Name:</td>
-                                <td style={letterStyles.td}>{data?.employeeName}</td>
+                                <td style={{ ...letterStyles.td, fontSize: '10px' }}>{data?.employeeName}</td>
                             </tr>
                             <tr>
                                 <td style={letterStyles.td}>Designation:</td>
@@ -217,10 +216,10 @@ export const ConsultantLetter = ({ data }) => {
                             </tr>
                             {/* Witness Section */}
                             <tr>
-                                <td colSpan={2} style={{ ...letterStyles.td, textAlign: 'center' }}>
+                                <td colSpan={2} style={{ ...letterStyles.td }}>
                                     <WitnessSignature witnessNumber={1} />
                                 </td>
-                                <td colSpan={2} style={{ ...letterStyles.td, textAlign: 'center' }}>
+                                <td colSpan={2} style={{ ...letterStyles.td }}>
                                     <WitnessSignature witnessNumber={2} />
                                 </td>
                             </tr>
@@ -241,12 +240,20 @@ export const ConsultantLetter = ({ data }) => {
 
                     {/* Page Content */}
                     <div style={{ ...letterStyles.justify }}>
-                        <div style={letterStyles.center}>
-                            <h2 style={{ margin: '0 0 30px 0', fontSize: '14pt' }}>Appendix-I</h2>
-                            <h3 style={{ margin: '0 0 20px 0', fontSize: '12pt' }}>
-                                Agreement between HLFPPT and {data?.employeeName}
-                            </h3>
-                            <h4 style={{ margin: '0', textDecoration: 'underline' }}>
+                        <div style={{ textAlign: 'center', lineHeight: '1.8' }}>
+                            <h2 style={{ margin: '0', fontSize: '14pt' }}>
+                                Appendix-I
+                            </h2>
+                            <div style={{ marginTop: '25px', fontSize: '12pt' }}>
+                                Agreement between HLFPPT
+                            </div>
+                            <div style={{ margin: '10px 0', fontSize: '12pt' }}>
+                                and
+                            </div>
+                            <div style={{ marginBottom: '25px', fontSize: '12pt' }}>
+                                {data?.employeeName}
+                            </div>
+                            <h4 style={{ margin: '0', textDecoration: 'underline', fontSize: '11pt' }}>
                                 Terms of reference for the post of Consultant
                             </h4>
                         </div>
