@@ -11,7 +11,7 @@ import {
     FooterWithSignatureOnly
 } from './components/LetterComponents';
 import config from '../../config/config';
-import { formatDate } from '../../utils/common';
+import { formatDate, formatDateDMY } from '../../utils/common';
 const footerStyle = {
     position: 'absolute',
     bottom: '25px',
@@ -26,7 +26,8 @@ const pageStyle = {
 
 
 export const ConsultantLetter = ({ data }) => {
-    const currentDate = formatDate(data?.currentDate) || formatDate(getCurrentDate());
+    console.log("data", data)
+    const currentDate = formatDateDMY(data?.currentDate) || formatDateDMY(getCurrentDate());
     const footerColor = data.webSettingData?.footer_color || '#3caf40';
     return (
         <div style={letterStyles.page}>
@@ -37,7 +38,7 @@ export const ConsultantLetter = ({ data }) => {
                 <LetterHeader webSettingData={data?.webSettingData} />
 
                 {/* Title */}
-                <div style={{ textAlign: 'center', fontFamily: 'Arial, sans-serif', fontSize: '10pt' }}>
+                <div style={{ textAlign: 'center', fontFamily: 'Arial, sans-serif', fontSize: '10pt', paddingTop: '25px' }}>
                     <p style={{ margin: '20px 0 5px 0', fontWeight: 'bold' }}>
                         Terms of Contract for Appointment as
                     </p>
@@ -54,7 +55,7 @@ export const ConsultantLetter = ({ data }) => {
                         Articles of Agreement made this day, the <strong>{formatDate(data?.joiningDate)}</strong> between
                         <strong> {data?.employeeName}</strong>, resident of S/O/D/O/W/O:
                         <strong> {data?.relativeName}</strong>, At-
-                        <strong> {data?.address}</strong>, hereinafter called the <strong>Party</strong>,
+                        <strong> {data?.location}</strong>, hereinafter called the <strong>Party</strong>,
                         of the one part and the <strong>Hindustan Latex Family Planning Promotion Trust (HLFPPT)</strong>,
                         {data?.webSettingData?.office_address}, hereinafter called the <strong>Trust</strong>,
                         of the other part.
@@ -73,8 +74,8 @@ export const ConsultantLetter = ({ data }) => {
                     <ol style={{ paddingLeft: '20px' }}>
                         <li style={{ marginBottom: '10px' }}>
                             The Party of the first part shall remain in the service of the Trust as
-                            <strong> Consultant</strong> from <strong>{formatDate(data?.joiningDate)}</strong> to
-                            <strong> {formatDate(data?.contractExpiryDate)}</strong> or till the completion of the project,
+                            <strong> Consultant</strong> from <strong>{formatDateDMY(data?.joiningDate)}</strong> to
+                            <strong> {formatDateDMY(data?.contractExpiryDate)}</strong> or till the completion of the project,
                             whichever is earlier (hereinafter called the ‘contractual period’), subject to the
                             provisions herein contained.
                         </li>
@@ -112,7 +113,7 @@ export const ConsultantLetter = ({ data }) => {
                             compensation whatsoever.
                         </li>
 
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '20px' }}>
                             Notwithstanding anything contained herein above, the consultancy services of the
                             Party may be terminated at any time by the Trust without any notice or notice pay or
                             consultancy fee whatsoever, if the Party is found guilty of any insubordination,
@@ -206,15 +207,15 @@ export const ConsultantLetter = ({ data }) => {
                                 </tr>
                                 <tr>
                                     <td style={letterStyles.td}>Name:</td>
-                                    <td style={{ ...letterStyles.td, fontSize: '10px' }}><strong>Awanish Awasthi</strong></td>
+                                    <td style={{ ...letterStyles.td, fontSize: '10px' }}><strong>{data?.webSettingData?.default_hr_details.name}</strong></td>
                                     <td style={letterStyles.td}>Name:</td>
-                                    <td style={{ ...letterStyles.td, fontSize: '10px' }}>{data?.employeeName}</td>
+                                    <td style={{ ...letterStyles.td, fontSize: '10px', fontWeight: 'bold' }}>{data?.employeeName}</td>
                                 </tr>
                                 <tr>
                                     <td style={letterStyles.td}>Designation:</td>
-                                    <td style={letterStyles.td}><strong>Associate National Lead–HR & Admin</strong></td>
+                                    <td style={letterStyles.td}><strong>{data?.webSettingData?.default_hr_details.designation}</strong></td>
                                     <td style={letterStyles.td}>Designation in the Trust:</td>
-                                    <td style={letterStyles.td}>{`Consultant (${data?.designation})`}</td>
+                                    <td style={{ ...letterStyles.td, fontWeight: 'bold' }}>{`Consultant (${data?.designation})`}</td>
                                 </tr>
                                 <tr>
                                     <td style={letterStyles.td}>Dated:</td>
@@ -234,7 +235,7 @@ export const ConsultantLetter = ({ data }) => {
                             </tbody>
                         </table>
                     </div>
-                    <div style={{ height: '3px', backgroundColor: footerColor, marginBottom: '15px' }} />
+                    <div style={{ height: '3px', backgroundColor: footerColor, marginTop: '65px' }} />
                 </div>
             </div>
 
@@ -338,9 +339,9 @@ export const ConsultantLetter = ({ data }) => {
                     {/* Page Content */}
                     <div style={{ ...letterStyles.justify }}>
                         <div style={{ textAlign: 'center', lineHeight: '1.8' }}>
-                            <h2 style={{ margin: '0', fontSize: '10pt' }}>
+                            <div style={{ margin: '0', fontSize: '10pt', paddingTop: '45px' }}>
                                 Appendix-II
-                            </h2>
+                            </div>
                             <div style={{ marginTop: '25px', fontSize: '10pt' }}>
                                 Agreement between HLFPPT
                             </div>

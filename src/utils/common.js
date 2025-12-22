@@ -396,6 +396,19 @@ const formatDate = (date) => {
     return `${day} ${month}, ${year}`;
 };
 
+// dd/mm/yyyy -> dd monthname year
+export const formatDateDMY = (input) => {
+    if (!input) return "";
+
+    const [day, month, year] = input.split("/");
+    const date = new Date(year, month - 1, day);
+
+    return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+};
 
 
 

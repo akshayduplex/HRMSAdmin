@@ -2,8 +2,9 @@
 import React from 'react';
 import { letterStyles, LetterHeader, FooterWithTextAndSignature, FooterWithSignatureOnly, DocumentWatermark } from './components/LetterComponents';
 import config from '../../config/config';
-import { formatDate } from '../../utils/common';
+import { formatDate, formatDateDMY } from '../../utils/common';
 export const AppointmentLetter = ({ data }) => {
+    console.log("apointment", data)
     const documentDate = data?.date ? formatDate(data.date) : formatDate(new Date());
     const footerColor = data.webSettingData?.footer_color || '#3caf40';
     // Format currency for salary display
@@ -37,7 +38,7 @@ export const AppointmentLetter = ({ data }) => {
             {/* PAGE 1 */}
             <div style={{
                 minHeight: '297mm',
-                padding: '15mm 20mm',
+                padding: '5mm 20mm',
                 position: 'relative'
             }}>
                 <DocumentWatermark webSettingData={data?.webSettingData} />
@@ -52,6 +53,7 @@ export const AppointmentLetter = ({ data }) => {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: '25px',
+                        paddingTop: '55px',
                         fontSize: '10pt',
                     }}
                 >
@@ -68,7 +70,7 @@ export const AppointmentLetter = ({ data }) => {
                 </div>
 
                 {/* Recipient Address */}
-                <div style={{ marginBottom: '40px' }}>
+                <div style={{ marginBottom: '5px' }}>
                     <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
                         {data?.employeeName},
                     </p>
@@ -77,7 +79,7 @@ export const AppointmentLetter = ({ data }) => {
                         W/O, S/O, D/O- {data?.relativeName}
                     </p>
 
-                    <p style={{ margin: '0 0 25px 0', fontWeight: 'bold' }}>
+                    <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
                         Address- {data?.address}
                     </p>
                 </div>
@@ -86,7 +88,7 @@ export const AppointmentLetter = ({ data }) => {
                 <div style={{ height: '25px' }}></div>
 
                 {/* Subject Line */}
-                <div style={{ textAlign: 'center', marginBottom: '35px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                     <p
                         style={{
                             margin: '0 0 5px 0',
@@ -126,7 +128,7 @@ export const AppointmentLetter = ({ data }) => {
                     </p>
 
                     <p style={{ margin: '0 0 15px 0' }}>
-                        We are pleased to offer you appointment as <strong>{data?.designation}</strong>, <strong>{data?.projectName}</strong>, <strong>{data?.location}</strong> on a contractual basis for a fixed term with effect from <strong>{formatDate(data?.joiningDate)}</strong> to <strong>{formatDate(data?.contractExpiryDate)}</strong> (or till the completion of the project whichever is earlier) so as to render your services to <strong>Hindustan Latex Family Planning Promotion Trust</strong> (abbreviated as HLFPPT). This Appointment offer letter will be void in case you fail to join on <strong>{formatDate(data?.joiningDate)}</strong>. You will be on probation for a period of <strong>Six months</strong>, during which period your performance will be closely watched. In the course of the work, periodic reviews, and regularly reporting is required to be made to <strong>{data?.reportingTo}</strong>, <strong>{data?.location}</strong>.
+                        We are pleased to offer you appointment as <strong>{data?.designation}</strong>, <strong>{data?.projectName}</strong>, <strong>{data?.location}</strong> on a contractual basis for a fixed term with effect from <strong>{formatDate(data?.joiningDate)}</strong> to <strong>{formatDateDMY(data?.contractExpiryDate)}</strong> (or till the completion of the project whichever is earlier) so as to render your services to <strong>Hindustan Latex Family Planning Promotion Trust</strong> (abbreviated as HLFPPT). This Appointment offer letter will be void in case you fail to join on <strong>{formatDate(data?.joiningDate)}</strong>. You will be on probation for a period of <strong>Six months</strong>, during which period your performance will be closely watched. In the course of the work, periodic reviews, and regularly reporting is required to be made to <strong>{data?.reportingTo}</strong>, <strong>{data?.location}</strong>.
                     </p>
 
                     <p style={{ margin: '15px 0 15px 0' }}>
@@ -138,13 +140,14 @@ export const AppointmentLetter = ({ data }) => {
                     </p>
 
                     {/* Terms and Conditions Title */}
-                    <h3 style={{
+                    <div style={{
                         textDecoration: 'none',
                         margin: '20px 0 10px 0',
+                        fontWeight: 'bold',
                         fontSize: '10pt'
                     }}>
                         Terms and conditions of employment:
-                    </h3>
+                    </div>
                 </div>
 
                 {/* Terms and Conditions List - First 2 items */}
@@ -178,11 +181,10 @@ export const AppointmentLetter = ({ data }) => {
             <div style={{
                 pageBreakBefore: 'always',
                 minHeight: '297mm',
-                padding: '15mm 20mm',
+                padding: '5mm 20mm',
                 position: 'relative'
             }}>
                 <DocumentWatermark webSettingData={data?.webSettingData} />
-
                 {/* Header on Page 2 */}
                 <LetterHeader webSettingData={data?.webSettingData} />
 
@@ -251,7 +253,7 @@ export const AppointmentLetter = ({ data }) => {
             <div style={{
                 pageBreakBefore: 'always',
                 minHeight: '297mm',
-                padding: '15mm 20mm',
+                padding: '5mm 20mm',
                 position: 'relative'
             }}
             >
@@ -309,9 +311,9 @@ export const AppointmentLetter = ({ data }) => {
                     </p>
 
                     <p style={{ marginTop: '20px', marginBottom: '5px' }}>
-                        <strong>Awanish Awasthi</strong>
+                        <strong>{data?.webSettingData?.default_hr_details.name}</strong>
                     </p>
-                    <p style={{ fontWeight: 'bold' }}>Associate National Lead- HR &amp; Admin</p>
+                    <p style={{ fontWeight: 'bold' }}>{data?.webSettingData?.default_hr_details.designation}</p>
                     <img
                         src={config.IMAGE_PATH + data?.webSettingData?.hod_hr_signature}
                         alt="HR Signature"
@@ -366,7 +368,7 @@ export const AppointmentLetter = ({ data }) => {
                             </tbody>
                         </table>
                     </div>
-                    <div style={{ height: '3px', backgroundColor: footerColor, marginTop: '45px' }} />
+                    <div style={{ height: '3px', backgroundColor: footerColor, marginTop: '135px' }} />
                 </div>
             </div>
 
@@ -374,7 +376,7 @@ export const AppointmentLetter = ({ data }) => {
             <div style={{
                 pageBreakBefore: 'always',
                 height: '297mm',
-                padding: '15mm 20mm',
+                padding: '5mm 20mm',
                 position: 'relative',
                 fontSize: '10pt',
                 lineHeight: '1.4',
@@ -390,26 +392,26 @@ export const AppointmentLetter = ({ data }) => {
                 <div>
                     {/* Annexure Header */}
                     <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                        <h2 style={{
+                        <div style={{
                             textDecoration: 'underline',
                             margin: '0',
                             fontSize: '12pt',
                             fontWeight: 'bold'
                         }}>
                             Annexure
-                        </h2>
+                        </div>
                     </div>
 
                     {/* Detailed Salary Structure */}
                     <div style={{ marginBottom: '20px' }}>
-                        <h3 style={{
+                        <div style={{
                             textDecoration: 'underline',
                             margin: '0 0 15px 0',
                             fontSize: '10pt',
                             fontWeight: 'bold'
                         }}>
                             Detailed Salary Structure:
-                        </h3>
+                        </div>
 
                         <div style={{ marginBottom: '20px' }}>
                             <p style={{ margin: '0 0 10px 0' }}>
@@ -865,10 +867,10 @@ export const AppointmentLetter = ({ data }) => {
 
                             <div style={{ marginTop: '5px' }}>
                                 <p style={{ margin: '0 0 5px 0' }}>
-                                    <strong>Awanish Awasthi</strong>
+                                    <strong>{data?.webSettingData?.default_hr_details.name}</strong>
                                 </p>
                                 <p style={{ margin: '0' }}>
-                                    Associate National Lead- HR & Admin
+                                    {data?.webSettingData?.default_hr_details.designation}
                                 </p>
                             </div>
                         </div>

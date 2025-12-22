@@ -566,7 +566,7 @@ const TemplatePreviewPage = () => {
                 add_by_email: loginUsers?.email || '',
             };
 
-            // For Appointment Letter after approval
+            /* ---------- After approval (send only) ---------- */
             if (templateType === 'appointment' && isApproved) {
                 url = `${config.API_URL}sendAppointmentLetterToCandidateAfterApproval`;
                 payload = {
@@ -574,7 +574,7 @@ const TemplatePreviewPage = () => {
                     email_subject: `Appointment Letter - ${candidateData?.name}`,
                 };
             }
-            // Default: Generate & send offer/appointment letter (with salary structure)
+            /* ---------- Generate + send (with content & salary) ---------- */
             else {
                 url = `${config.API_URL}send_approval_mail`;
                 const formData = new FormData();
@@ -602,11 +602,10 @@ const TemplatePreviewPage = () => {
 
             if (response.status === 200) {
                 toast.success(response.data?.message || "Letter generated and sent successfully!");
-                // Optional: navigate back after success
-                // navigate(-1);
             } else {
                 toast.error(response.data?.message || "Failed to send letter");
             }
+
         } catch (error) {
             console.error("Error in handleSend:", error);
             toast.error(error?.response?.data?.message || "Failed to generate/send letter");
@@ -614,6 +613,7 @@ const TemplatePreviewPage = () => {
             setLoading(false);
         }
     };
+
     const calculatePF = (basic) => basic ? Math.round((basic * 12) / 100) : 0;
     const calculateGratuity = (basic) => basic ? Math.round((basic * 12 * 4.81) / 100) : 0;
     const calculateWorkmenComp = (annualGross) => annualGross ? Math.round(annualGross * 0.02) : 0;
@@ -753,7 +753,7 @@ printColorAdjust: 'exact',
                                                 Generating...
                                             </>
                                         ) : (
-                                            'Generate & Send'
+                                            'Generate'
                                         )}
                                     </Button>
                                 )}

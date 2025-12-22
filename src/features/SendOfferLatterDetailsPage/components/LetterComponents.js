@@ -25,7 +25,7 @@ export const letterStyles = {
         width: '210mm',
         height: '297mm',
         backgroundColor: 'white',
-        padding: '20mm 20mm 70mm 20mm',
+        padding: '5mm 15mm 5mm 15mm',
         display: 'block',
         margin: '0 auto',
         boxSizing: 'border-box',
@@ -75,7 +75,7 @@ export const DocumentWatermark = ({ webSettingData }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 pointerEvents: 'none',
-                zIndex: 0,          // 👈 IMPORTANT
+                zIndex: 0,
             }}
         >
             <img
@@ -92,8 +92,7 @@ export const DocumentWatermark = ({ webSettingData }) => {
 };
 
 
-// Simple Header Component - Only logo with header line
-// In LetterComponents.jsx - Update LetterHeader
+//Header Component - Only logo with header line
 export const LetterHeader = ({ webSettingData }) => {
     const headerColor = webSettingData?.header_color || '#811845';
 
@@ -101,7 +100,7 @@ export const LetterHeader = ({ webSettingData }) => {
         <div style={{
             marginBottom: '40px',
             position: 'relative',
-            paddingTop: '10px' // Space for the line
+            paddingTop: '10px'
         }}>
             {/* Always show the header colored line on EVERY page */}
             <div style={{
@@ -114,7 +113,7 @@ export const LetterHeader = ({ webSettingData }) => {
             {webSettingData?.logo_image && (
                 <div style={{
                     position: 'absolute',
-                    top: '15px',  // Below the colored line
+                    top: '25px',
                     left: '0'
                 }}>
                     <img
@@ -124,7 +123,8 @@ export const LetterHeader = ({ webSettingData }) => {
                             height: '20mm',
                             maxWidth: '45mm',
                             objectFit: 'contain',
-                            opacity: 0.8
+                            opacity: 0.8,
+                            paddingBottom: '10px'
                         }}
                     />
                 </div>
@@ -140,7 +140,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '40px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '40px', marginTop: '200px' }}>
                 <div style={{ fontSize: '8pt', color: '#1d1e30' }}>
                     <p style={{ margin: '0 0 2px 0', fontWeight: 'bold' }}>
                         {webSettingData?.meta_title || 'Hindustan Latex Family Planning Promotion Trust'}
@@ -156,7 +156,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
                         Email:{' '}
                         <a
                             href={`mailto:${webSettingData?.organization_email_id || 'N/A'}`}
-                            style={{ color: '#303af3ff', textDecoration: 'none' }}
+                            style={{ color: '#303af3ff', textDecoration: 'underline' }}
                         >
                             {webSettingData?.organization_email_id || 'N/A'}
                         </a>{' '}
@@ -169,7 +169,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ color: '#303af3ff', textDecoration: 'none' }}
+                            style={{ color: '#303af3ff', textDecoration: 'underline' }}
                         >
                             {cleanWebsite}
                         </a>
@@ -179,7 +179,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
                     <img
                         src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
                         alt="HR Signature"
-                        style={{ width: '80px', height: '40px', objectFit: 'contain' }}
+                        style={{ width: '95px', height: '55px', objectFit: 'contain' }}
                     />
                 )}
             </div>
@@ -199,7 +199,7 @@ export const FooterWithSignatureOnly = ({ webSettingData, showSignature = true }
                     <img
                         src={config.IMAGE_PATH + webSettingData.hod_hr_signature}
                         alt="HR Signature"
-                        style={{ width: '80px', height: '40px', objectFit: 'contain' }}
+                        style={{ width: '95px', height: '55px', objectFit: 'contain' }}
                     />
                 )}
             </div>
@@ -265,20 +265,20 @@ export const WitnessSignature = ({ witnessNumber = 1 }) => {
             </p>
 
             <p style={{ margin: '8px 0', fontSize: '8px' }}>
-                Signature: __________________
+                Signature:
             </p>
 
             {/* Name line – font size 10 */}
             <p style={{ margin: '8px 0', fontSize: '8px' }}>
-                Name: __________________
+                Name:
             </p>
 
             <p style={{ margin: '8px 0', fontSize: '8px' }}>
-                Address: __________________
+                Address:
             </p>
 
             <p style={{ margin: '8px 0', fontSize: '8px' }}>
-                Dated: __________________
+                Dated:
             </p>
         </div>
     );
