@@ -1,16 +1,11 @@
 // AppointmentLetter.jsx
 import React from 'react';
-import { letterStyles, LetterHeader, FooterWithTextAndSignature, FooterWithSignatureOnly } from './components/LetterComponents';
+import { letterStyles, LetterHeader, FooterWithTextAndSignature, FooterWithSignatureOnly, DocumentWatermark } from './components/LetterComponents';
 import config from '../../config/config';
+import { formatDate } from '../../utils/common';
 export const AppointmentLetter = ({ data }) => {
-    // Format date properly
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB');
-    };
-
     const documentDate = data?.date ? formatDate(data.date) : formatDate(new Date());
+    const footerColor = data.webSettingData?.footer_color || '#3caf40';
     // Format currency for salary display
     const formatCurrency = (amount) => {
         if (!amount && amount !== 0) return '0';
@@ -32,13 +27,12 @@ export const AppointmentLetter = ({ data }) => {
     return (
         <div style={{
             ...letterStyles.page,
+            ...letterStyles.AppointmentTextStyle,
             padding: '0',
             width: '210mm',
             height: 'auto',
             minHeight: '297mm',
             position: 'relative',
-            fontFamily: "'Times New Roman', Times, serif",
-            fontSize: '11pt'
         }}>
             {/* PAGE 1 */}
             <div style={{
@@ -46,66 +40,78 @@ export const AppointmentLetter = ({ data }) => {
                 padding: '15mm 20mm',
                 position: 'relative'
             }}>
+                <DocumentWatermark webSettingData={data?.webSettingData} />
+
                 {/* Header on Page 1 */}
                 <LetterHeader webSettingData={data?.webSettingData} />
 
                 {/* Reference and Date */}
-                <div style={{
-                    textAlign: 'right',
-                    marginBottom: '25px',
-                    fontSize: '11pt'
-                }}>
-                    <p style={{ margin: '0 0 5px 0' }}>
-                        <strong>HLFPPT/HR/{data?.projectName}/EC-{data?.ecNumber}</strong>
-                    </p>
-                    <p style={{ margin: '0' }}>
-                        <strong>Date: {documentDate}</strong>
-                    </p>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '25px',
+                        fontSize: '10pt',
+                    }}
+                >
+                    <div>
+                        <strong>
+                            HLFPPT/HR/{data?.projectName}/EC-{data?.ecNumber}
+                        </strong>
+                    </div>
+                    <div>
+                        <strong>
+                            Date: {documentDate}
+                        </strong>
+                    </div>
                 </div>
 
                 {/* Recipient Address */}
-                <div style={{
-                    marginBottom: '30px',
-                    fontSize: '11pt'
-                }}>
-                    <p style={{ margin: '0 0 5px 0' }}>
-                        <strong>{data?.employeeName},</strong>
+                <div style={{ marginBottom: '40px' }}>
+                    <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
+                        {data?.employeeName},
                     </p>
-                    <p style={{ margin: '0 0 5px 0' }}>
-                        <strong>W/O, S/O, D/O- {data?.relativeName}</strong>
+
+                    <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
+                        W/O, S/O, D/O- {data?.relativeName}
                     </p>
-                    <p style={{ margin: '0 0 15px 0' }}>
-                        <strong>Address- {data?.address}</strong>
+
+                    <p style={{ margin: '0 0 25px 0', fontWeight: 'bold' }}>
+                        Address- {data?.address}
                     </p>
                 </div>
 
+                {/* EXTRA GAP BEFORE SUBJECT */}
+                <div style={{ height: '25px' }}></div>
+
                 {/* Subject Line */}
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '25px'
-                }}>
-                    <h2 style={{
-                        textDecoration: 'underline',
-                        margin: '0 0 5px 0',
-                        fontSize: '12pt',
-                        fontWeight: 'bold'
-                    }}>
+                <div style={{ textAlign: 'center', marginBottom: '35px' }}>
+                    <p
+                        style={{
+                            margin: '0 0 5px 0',
+                            fontWeight: 'bold',
+                            textDecoration: 'underline',
+                        }}
+                    >
                         SUBJECT: OFFER CUM APPOINTMENT LETTER ON FIXED TERM CONTRACT WITH
-                    </h2>
-                    <h2 style={{
-                        textDecoration: 'underline',
-                        margin: '0',
-                        fontSize: '12pt',
-                        fontWeight: 'bold'
-                    }}>
+                    </p>
+
+                    <p
+                        style={{
+                            margin: '0',
+                            fontWeight: 'bold',
+                            textDecoration: 'underline',
+                        }}
+                    >
                         HINDUSTAN LATEX FAMILY PLANNING PROMOTION TRUST
-                    </h2>
+                    </p>
                 </div>
 
                 {/* Salutation */}
-                <div style={{ marginBottom: '15px', fontSize: '11pt' }}>
-                    <p style={{ margin: '0 0 10px 0' }}>
-                        <strong>Dear Mr./Ms. {data?.employeeName},</strong>
+                <div style={{ marginBottom: '20px' }}>
+                    <p style={{ margin: 0, fontWeight: 'bold' }}>
+                        Dear Mr./Ms. {data?.employeeName},
                     </p>
                 </div>
 
@@ -133,10 +139,9 @@ export const AppointmentLetter = ({ data }) => {
 
                     {/* Terms and Conditions Title */}
                     <h3 style={{
-                        textDecoration: 'underline',
+                        textDecoration: 'none',
                         margin: '20px 0 10px 0',
-                        fontSize: '12pt',
-                        fontWeight: 'bold'
+                        fontSize: '10pt'
                     }}>
                         Terms and conditions of employment:
                     </h3>
@@ -176,6 +181,8 @@ export const AppointmentLetter = ({ data }) => {
                 padding: '15mm 20mm',
                 position: 'relative'
             }}>
+                <DocumentWatermark webSettingData={data?.webSettingData} />
+
                 {/* Header on Page 2 */}
                 <LetterHeader webSettingData={data?.webSettingData} />
 
@@ -248,6 +255,8 @@ export const AppointmentLetter = ({ data }) => {
                 position: 'relative'
             }}
             >
+                <DocumentWatermark webSettingData={data?.webSettingData} />
+
                 {/* Header */}
                 <LetterHeader webSettingData={data?.webSettingData} />
 
@@ -293,16 +302,16 @@ export const AppointmentLetter = ({ data }) => {
                     {/* Closing */}
                     <p>Thanking You,</p>
 
-                    <p style={{ marginTop: '20px' }}>Yours Sincerely,</p>
+                    <p style={{ marginTop: '10px' }}>Yours Sincerely,</p>
 
                     <p>
                         For <strong>HINDUSTAN LATEX FAMILY PLANNING PROMOTION TRUST</strong>,
                     </p>
 
-                    <p style={{ marginTop: '40px', marginBottom: '5px' }}>
+                    <p style={{ marginTop: '20px', marginBottom: '5px' }}>
                         <strong>Awanish Awasthi</strong>
                     </p>
-                    <p>Associate National Lead- HR &amp; Admin</p>
+                    <p style={{ fontWeight: 'bold' }}>Associate National Lead- HR &amp; Admin</p>
                     <img
                         src={config.IMAGE_PATH + data?.webSettingData?.hod_hr_signature}
                         alt="HR Signature"
@@ -329,21 +338,51 @@ export const AppointmentLetter = ({ data }) => {
                         <p>
                             <strong>Name:</strong> {data?.employeeName}
                         </p>
-                        <p>
-                            <strong>Date:</strong> ______________________
-                            <span style={{ float: 'right' }}>(Signature)</span>
-                        </p>
+                        <table style={{ width: '100%', marginTop: '30px' }}>
+                            <tbody>
+                                <tr>
+                                    <td style={{ textAlign: 'left' }}>
+                                        <strong>Date:</strong> ______________________
+                                    </td>
+
+                                    <td style={{ textAlign: 'right' }}>
+                                        <div
+                                            style={{
+                                                width: '150px',
+                                                marginLeft: 'auto',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    borderTop: '1px solid #000',
+                                                    marginBottom: '4px',
+                                                }}
+                                            ></div>
+                                            <div>(Signature)</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                    <div style={{ height: '3px', backgroundColor: footerColor, marginTop: '45px' }} />
                 </div>
             </div>
 
             {/* PAGE 4 - Page Break (Annexure) */}
             <div style={{
                 pageBreakBefore: 'always',
-                minHeight: '297mm',
+                height: '297mm',
                 padding: '15mm 20mm',
-                position: 'relative'
+                position: 'relative',
+                fontSize: '10pt',
+                lineHeight: '1.4',
+                boxSizing: 'border-box',
+                overflow: 'hidden'
             }}>
+                <DocumentWatermark webSettingData={data?.webSettingData} />
+
                 {/* Header on Page 4 */}
                 <LetterHeader webSettingData={data?.webSettingData} />
 
@@ -354,7 +393,7 @@ export const AppointmentLetter = ({ data }) => {
                         <h2 style={{
                             textDecoration: 'underline',
                             margin: '0',
-                            fontSize: '14pt',
+                            fontSize: '12pt',
                             fontWeight: 'bold'
                         }}>
                             Annexure
@@ -362,11 +401,11 @@ export const AppointmentLetter = ({ data }) => {
                     </div>
 
                     {/* Detailed Salary Structure */}
-                    <div style={{ marginBottom: '30px' }}>
+                    <div style={{ marginBottom: '20px' }}>
                         <h3 style={{
                             textDecoration: 'underline',
-                            margin: '0 0 20px 0',
-                            fontSize: '12pt',
+                            margin: '0 0 15px 0',
+                            fontSize: '10pt',
                             fontWeight: 'bold'
                         }}>
                             Detailed Salary Structure:
@@ -380,23 +419,22 @@ export const AppointmentLetter = ({ data }) => {
                                 <strong>Designation:</strong> {data?.designation}
                             </p>
                         </div>
-
-                        {/* OPTION 1: Render the HTML description if available */}
                         {data?.description && (
                             <div dangerouslySetInnerHTML={{ __html: data.description }} />
                         )}
 
-                        {/* OPTION 2: OR Render dynamic salary table if salaryData exists */}
                         {!data?.description && hasSalaryBreakup && (
                             <>
                                 {/* Monthly Salary Table */}
                                 <table style={{
                                     width: '100%',
                                     borderCollapse: 'collapse',
-                                    marginBottom: '30px'
+                                    marginBottom: '20px',
+                                    breakInside: 'avoid',
+                                    pageBreakInside: 'avoid'
                                 }}>
                                     <thead>
-                                        <tr style={{ backgroundColor: '#f2f2f2' }}>
+                                        <tr style={{ backgroundColor: '#f2f2f2', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                                             <th style={{
                                                 border: '1px solid #ddd',
                                                 padding: '10px',
@@ -640,15 +678,15 @@ export const AppointmentLetter = ({ data }) => {
                                 </table>
 
                                 {/* Additional Benefits Section */}
-                                <div style={{ marginBottom: '40px' }}>
-                                    <h4 style={{
+                                <div style={{ marginBottom: '20px' }}>
+                                    <div style={{
                                         textDecoration: 'underline',
-                                        margin: '0 0 20px 0',
-                                        fontSize: '11pt',
-                                        fontWeight: 'bold'
+                                        fontSize: '10pt',
+                                        fontWeight: 'bold',
+                                        margin: '0 0 10px 0'
                                     }}>
                                         Additional Benefits:
-                                    </h4>
+                                    </div>
 
                                     <div style={{ lineHeight: '2' }}>
                                         {/* PF Annual */}
@@ -702,7 +740,7 @@ export const AppointmentLetter = ({ data }) => {
                                 <table style={{
                                     width: '100%',
                                     borderCollapse: 'collapse',
-                                    marginBottom: '30px'
+                                    marginBottom: '20px'
                                 }}>
                                     <tbody>
                                         <tr>
@@ -741,37 +779,72 @@ export const AppointmentLetter = ({ data }) => {
                                 </table>
 
                                 {/* Original Additional Benefits */}
-                                <div style={{ marginBottom: '40px' }}>
-                                    <h4 style={{
-                                        textDecoration: 'underline',
-                                        margin: '0 0 20px 0',
-                                        fontSize: '11pt',
-                                        fontWeight: 'bold'
-                                    }}>
+                                <div
+                                    style={{
+                                        marginBottom: '20px',
+                                        fontSize: '10pt',
+                                        breakInside: 'avoid',
+                                        pageBreakInside: 'avoid'
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            textDecoration: 'underline',
+                                            fontSize: '10pt',
+                                            fontWeight: 'bold',
+                                            margin: '0 0 10px 0'
+                                        }}
+                                    >
                                         Additional Benefits:
-                                    </h4>
+                                    </div>
 
-                                    <div style={{ lineHeight: '2' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <div style={{ lineHeight: '1.6' }}>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                fontWeight: 'bold',
+                                                marginBottom: '6px'
+                                            }}
+                                        >
                                             <span>Company's Contribution towards PF (per annum) @ 12%</span>
                                             <span>Rs. {data?.pfAmount || '00.00'}</span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                fontWeight: 'bold',
+                                                marginBottom: '6px'
+                                            }}
+                                        >
                                             <span>Workmen Compensation Annual Premium</span>
                                             <span>Rs. {data?.workmenComp || '00.00'}</span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                fontWeight: 'bold',
+                                                marginBottom: '10px'
+                                            }}
+                                        >
                                             <span>Gratuity @ 4.81% of Basic (Per annum) - Notional Pay</span>
                                             <span>Rs. {data?.gratuity || '00.00'}</span>
                                         </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            marginTop: '20px',
-                                            paddingTop: '10px',
-                                            borderTop: '2px solid black',
-                                            fontWeight: 'bold'
-                                        }}>
+
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                marginTop: '10px',
+                                                paddingTop: '6px',
+                                                borderTop: '1.5px solid black',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
                                             <span>Total Annual Impact (CTC)</span>
                                             <span>Rs. {data?.totalCTC || '0'}</span>
                                         </div>
@@ -781,16 +854,16 @@ export const AppointmentLetter = ({ data }) => {
                         )}
 
                         {/* Annexure Signatory */}
-                        <div style={{ marginTop: '60px' }}>
-                            <p style={{ margin: '0 0 20px 0' }}>
+                        <div style={{ marginTop: '15px', fontWeight: 'bold' }}>
+                            <p style={{ margin: '0 0 5px 0' }}>
                                 Yours Sincerely,
                             </p>
 
-                            <p style={{ margin: '0 0 10px 0' }}>
+                            <p style={{ margin: '0 0 5px 0' }}>
                                 For <strong>HLFPPT</strong>,
                             </p>
 
-                            <div style={{ marginTop: '30px' }}>
+                            <div style={{ marginTop: '5px' }}>
                                 <p style={{ margin: '0 0 5px 0' }}>
                                     <strong>Awanish Awasthi</strong>
                                 </p>
@@ -805,7 +878,7 @@ export const AppointmentLetter = ({ data }) => {
                 {/* Footer with Signature Only - Page 4 */}
                 <div style={{
                     position: 'absolute',
-                    bottom: '15mm',
+                    bottom: '5mm',
                     left: '20mm',
                     right: '20mm'
                 }}>

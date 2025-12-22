@@ -23,16 +23,17 @@ export const getCurrentDate = () => {
 export const letterStyles = {
     page: {
         width: '210mm',
-        minHeight: '297mm',
+        height: '297mm',
         backgroundColor: 'white',
         padding: '20mm 20mm 70mm 20mm',
-        display: 'table',
+        display: 'block',
         margin: '0 auto',
         boxSizing: 'border-box',
         fontFamily: '"Arial, sans-serif',
         fontSize: '11pt',
         lineHeight: '1.5',
         color: '#000',
+        zIndex: 1,
         position: 'relative'
     },
     bold: { fontWeight: 'bold' },
@@ -45,6 +46,16 @@ export const letterStyles = {
         display: 'flex',
         justifyContent: 'space-between',
         marginTop: '50px'
+    },
+    baseTextStyle: {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '10pt',
+        lineHeight: '1.5'
+    },
+    AppointmentTextStyle: {
+        fontFamily: 'Century Gothic, Arial, sans-serif',
+        fontSize: '10pt',
+        lineHeight: '1.5'
     }
 };
 
@@ -53,27 +64,33 @@ export const DocumentWatermark = ({ webSettingData }) => {
     if (!webSettingData?.water_mark_file || webSettingData?.water_mark_file === 'null') return null;
 
     return (
-        <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%) rotate(-45deg)',
-            zIndex: -1,
-            opacity: 0.1,
-            pointerEvents: 'none'
-        }}>
+        <div
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                zIndex: 0,          // 👈 IMPORTANT
+            }}
+        >
             <img
                 src={config.IMAGE_PATH + webSettingData.water_mark_file}
                 alt="Watermark"
                 style={{
-                    width: '80%',
-                    height: 'auto',
-                    opacity: 0.1
+                    width: '70%',
+                    opacity: 0.08,
+                    transform: 'rotate(-45deg)',
                 }}
             />
         </div>
     );
 };
+
 
 // Simple Header Component - Only logo with header line
 // In LetterComponents.jsx - Update LetterHeader
@@ -139,7 +156,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
                         Email:{' '}
                         <a
                             href={`mailto:${webSettingData?.organization_email_id || 'N/A'}`}
-                            style={{ color: '#1d1e30', textDecoration: 'none' }}
+                            style={{ color: '#303af3ff', textDecoration: 'none' }}
                         >
                             {webSettingData?.organization_email_id || 'N/A'}
                         </a>{' '}
@@ -152,7 +169,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ color: '#1d1e30', textDecoration: 'none' }}
+                            style={{ color: '#303af3ff', textDecoration: 'none' }}
                         >
                             {cleanWebsite}
                         </a>
@@ -232,7 +249,7 @@ export const WitnessSignature = ({ witnessNumber = 1 }) => {
                 textAlign: 'left',
                 marginTop: '20px',
                 fontFamily: 'Arial, sans-serif',
-                fontSize: '8px',
+                fontSize: '8px'
             }}
         >
             <p
@@ -240,26 +257,27 @@ export const WitnessSignature = ({ witnessNumber = 1 }) => {
                     margin: '0 0 5px 0',
                     fontSize: '8px',
                     textDecoration: 'underline',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    paddingLeft: '126px'
                 }}
             >
                 Witness {witnessNumber}
             </p>
 
-            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+            <p style={{ margin: '8px 0', fontSize: '8px' }}>
                 Signature: __________________
             </p>
 
             {/* Name line – font size 10 */}
-            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+            <p style={{ margin: '8px 0', fontSize: '8px' }}>
                 Name: __________________
             </p>
 
-            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+            <p style={{ margin: '8px 0', fontSize: '8px' }}>
                 Address: __________________
             </p>
 
-            <p style={{ margin: '5px 0', fontSize: '8px' }}>
+            <p style={{ margin: '8px 0', fontSize: '8px' }}>
                 Dated: __________________
             </p>
         </div>

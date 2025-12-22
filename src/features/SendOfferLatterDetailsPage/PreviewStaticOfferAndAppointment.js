@@ -355,6 +355,7 @@ const TemplatePreviewPage = () => {
 
                 if (approvalResponse.status === 200) {
                     const approvalData = approvalResponse.data.data;
+                    console.log("approvalData", approvalData)
                     setApprovalData(approvalData);
 
                     // Find the specific candidate
@@ -656,6 +657,9 @@ const TemplatePreviewPage = () => {
         @page {
             size: A4;
             margin: 0; /* We control margins via padding in the letter */
+            opacity: 0.08,
+WebkitPrintColorAdjust: 'exact',
+printColorAdjust: 'exact',
         }
 
         /* Critical: Hide browser default header/footer */
