@@ -72,11 +72,23 @@ const TemplatePreviewPage = () => {
         setSalaryUpdateTrigger(prev => prev + 1);
         setSalaryConfirmed(true);
         setSalaryOpen(false);
-        toast.success("Salary structure saved successfully!");
     };
     const jobTypeLower = candidateData?.job_type || '';
 
-    // Show Salary Structure button for both "On Role" and "Consultant" types
+    const savedSalaryStructure = useMemo(() => {
+        if (!candidateData?.salary_structure_data) {
+            return null;
+        }
+
+        try {
+            const parsed = JSON.parse(candidateData.salary_structure_data);
+            return parsed;
+        } catch (error) {
+            console.error("Failed to parse salary_structure_data from DB:", error);
+            return null;
+        }
+    }, [candidateData?.salary_structure_data]);
+
     const showSalaryStructureBtn =
         jobTypeLower === 'OnRole' ||
         jobTypeLower === 'OnContract'
@@ -118,7 +130,6 @@ const TemplatePreviewPage = () => {
         if (salaryData.isEmpanelledOrConsultant) addRow('Gross', salaryData.takeHomeMonthly);
 
         // Employer Contributions
-        // employer benefit (could be ESIC / Mediclaim / Workmen / Others)
         if (salaryData && Number(salaryData.employerBenefitAmount) > 0) {
             const t = salaryData.employerBenefitType || 'others';
             const label = t === 'esic' ? 'ESIC (Employer)' : t === 'mediclaim' ? 'Mediclaim' : t === 'workmen' ? 'Workmen Compensation' : (salaryData.employerBenefitTitle || 'Other Benefit');
@@ -281,7 +292,6 @@ const TemplatePreviewPage = () => {
             try {
                 let response = await axios.get(`${config.API_URL}getAllSettingData`, apiHeaderToken(config.API_TOKEN));
                 if (response.status === 200) {
-                    console.log("websetting", response?.data?.data)
                     setWebSettingData(response?.data?.data);
                 }
             } catch (error) {
@@ -348,14 +358,13 @@ const TemplatePreviewPage = () => {
 
                 // Fetch approval data
                 const approvalResponse = await axios.post(
-                    `${config.API_URL}getAppraisalNoteById`,
-                    { approval_note_doc_id: approvalId },
+                    `${config.API_URL}getAppraisalNoteDataById`,
+                    { approval_note_doc_id: approvalId, cand_doc_id: candidateId },
                     apiHeaderToken(config.API_TOKEN)
                 );
-
                 if (approvalResponse.status === 200) {
                     const approvalData = approvalResponse.data.data;
-                    console.log("approvalData", approvalData)
+                    console.log("Candidate data", approvalData)
                     setApprovalData(approvalData);
 
                     // Find the specific candidate
@@ -388,7 +397,45 @@ const TemplatePreviewPage = () => {
             const templateData = prepareTemplateData(candidateData, approvalData, totalSalaryBreakup);
             setTemplateData(templateData);
         }
-    }, [candidateData, approvalData, webSettingData, totalSalaryBreakup]); // Add totalSalaryBreakup dependency
+    }, [candidateData, approvalData, webSettingData, totalSalaryBreakup]);
+
+
+    useEffect(() => {
+        if (savedSalaryStructure && !totalSalaryBreakup) {
+            setTotalSalaryBreakup(savedSalaryStructure);
+            setSalaryConfirmed(true);
+            setSalaryUpdateTrigger(prev => prev + 1);
+        }
+    }, [savedSalaryStructure]);
+
+    const formatAddress = (addr) => {
+        if (!addr) return '';
+        return [
+            addr.address,
+            addr.city,
+            addr.state,
+            addr.pincode
+        ].filter(Boolean).join(', ');
+    };
+
+    const getRelativeName = (candidate) => {
+        if (candidate.father_name) {
+            return candidate.father_name;
+        }
+
+        const spouse = candidate.family_members?.find(m =>
+            m.particulars?.toLowerCase().includes('wife') ||
+            m.particulars?.toLowerCase().includes('husband')
+        );
+        if (spouse) return spouse.name;
+
+        const mother = candidate.family_members?.find(m =>
+            m.particulars?.toLowerCase().includes('mother')
+        );
+        if (mother) return mother.name;
+
+        return '';
+    };
 
     // In TemplatePreviewPage.jsx
     const prepareTemplateData = (candidate, approval, salaryBreakup = null) => {
@@ -397,7 +444,6 @@ const TemplatePreviewPage = () => {
         // Determine template type based on job_type and job_designation
         const jobType = candidate.job_type || '';
         const jobDesignation = approval.job_designation || '';
-
         // Check if it's consultant based on job_type or job_designation
         const isConsultant = jobType.toLowerCase().includes('consultant') ||
             jobDesignation.toLowerCase().includes('consultant') ||
@@ -414,11 +460,12 @@ const TemplatePreviewPage = () => {
             joiningDate: formatDate(candidate.onboarding_date),
             contractExpiryDate: formatDate(candidate.job_valid_date),
             currentDate: currentDate,
-            address: candidate.address || '',
-            relativeName: candidate.emergency_contact_name || '',
+            candidateAddress: formatAddress(candidate.communication_address),
+            relativeName: getRelativeName(candidate),
+            fatherName: candidate.father_name || getRelativeName(candidate),
             ctcAmount: candidate.offer_ctc ? candidate.offer_ctc.toString() : '0',
             paymentType: candidate.payment_type || '',
-            reportingTo: 'Project Manager',
+            reportingTo: candidate.reporting_manager || 'Project Manager',
             candidateId: candidate.cand_doc_id || candidateId,
             approvalNoteId: approval.approval_note_id || '',
             projectId: approval.project_id || '',
@@ -537,10 +584,11 @@ const TemplatePreviewPage = () => {
 
         return str.trim() + ' Rupees Only';
     };
+
     const handleSend = async (event) => {
         event?.preventDefault();
 
-        if (!salaryConfirmed) {
+        if (!salaryConfirmed && showSalaryStructureBtn) {
             toast.warning("Please confirm the salary structure before generating the letter.");
             return;
         }
@@ -548,67 +596,68 @@ const TemplatePreviewPage = () => {
         try {
             setLoading(true);
 
+            const printContent = templateRef.current;
+            if (!printContent) {
+                toast.error("Template content not ready");
+                return;
+            }
+
+            // Clone DOM
+            const contentClone = printContent.cloneNode(true);
+            contentClone.querySelectorAll('.debug, .watermark').forEach(el => el.remove());
+
+            const renderedHtml = contentClone.innerHTML;
+
+            const fullHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>${templateData.isConsultant ? 'Consultant Agreement' : 'Appointment Letter'}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    ${renderedHtml}
+</body>
+</html>`;
+
             const loginUsers = JSON.parse(localStorage.getItem('admin_role_user')) || {};
-            const isApproved = candidateData?.appointment_letter_verification_status?.status === 'Complete' ||
-                candidateData?.document_status?.status === 'approved';
 
-            let url = '';
-            let payload = {};
-            let isMultipart = false;
-            let headers = apiHeaderToken(config.API_TOKEN);
+            // PLAIN JSON PAYLOAD
+            const payload = {
+                approval_note_id: approvalId,
+                candidate_id: candidateId,
+                selected_doc: templateData.isConsultant
+                    ? "Consultant Agreement"
+                    : "Appointment Letter",
 
-            const basePayload = {
-                candidate_doc_id: candidateId,
-                approval_note_doc_id: approvalId,
+                contents: fullHtml,
+
                 add_by_name: loginUsers?.name || '',
-                add_by_designation: loginUsers?.designation || '',
                 add_by_mobile: loginUsers?.mobile_no || '',
+                add_by_designation: loginUsers?.designation || '',
                 add_by_email: loginUsers?.email || '',
+
+                salary_structure: totalSalaryBreakup || null
             };
 
-            /* ---------- After approval (send only) ---------- */
-            if (templateType === 'appointment' && isApproved) {
-                url = `${config.API_URL}sendAppointmentLetterToCandidateAfterApproval`;
-                payload = {
-                    ...basePayload,
-                    email_subject: `Appointment Letter - ${candidateData?.name}`,
-                };
-            }
-            /* ---------- Generate + send (with content & salary) ---------- */
-            else {
-                url = `${config.API_URL}send_approval_mail`;
-                const formData = new FormData();
-
-                formData.append("contents", description);
-                formData.append("approval_note_id", approvalId);
-                formData.append("candidate_id", candidateId);
-                formData.append("email_subject", `Appointment Letter - ${candidateData?.name}`);
-                formData.append("add_by_name", loginUsers?.name || '');
-                formData.append("add_by_mobile", loginUsers?.mobile_no || '');
-                formData.append("add_by_designation", loginUsers?.designation || '');
-                formData.append("add_by_email", loginUsers?.email || '');
-
-                // Attach salary structure if confirmed
-                if (totalSalaryBreakup) {
-                    formData.append('salary_structure', JSON.stringify(totalSalaryBreakup));
-                }
-
-                payload = formData;
-                isMultipart = true;
-                headers = { ...apiHeaderTokenMultiPart(config.API_TOKEN) };
-            }
-
-            const response = await axios.post(url, payload, headers);
+            const response = await axios.post(
+                `${config.API_URL}send_appointment_mail`,
+                payload,
+                apiHeaderToken(config.API_TOKEN)
+            );
 
             if (response.status === 200) {
-                toast.success(response.data?.message || "Letter generated and sent successfully!");
+                toast.success(response.data?.message || "Letter sent successfully!");
             } else {
                 toast.error(response.data?.message || "Failed to send letter");
             }
 
         } catch (error) {
-            console.error("Error in handleSend:", error);
-            toast.error(error?.response?.data?.message || "Failed to generate/send letter");
+            console.error("Error sending letter:", error);
+            toast.error(error?.response?.data?.message || "Failed to send letter");
         } finally {
             setLoading(false);
         }
@@ -780,7 +829,7 @@ printColorAdjust: 'exact',
                     onHide={() => setSalaryOpen(false)}
                     offer_ctc={candidateData?.offer_ctc}
                     payment_type={candidateData?.payment_type}
-                    initialValues={totalSalaryBreakup || {}}
+                    initialValues={savedSalaryStructure || totalSalaryBreakup || {}}
                     saveDataToValue={handleSalarySave}
                     candidate_details={candidateData}
                 />

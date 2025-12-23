@@ -4,7 +4,7 @@ import { letterStyles, LetterHeader, FooterWithTextAndSignature, FooterWithSigna
 import config from '../../config/config';
 import { formatDate, formatDateDMY } from '../../utils/common';
 export const AppointmentLetter = ({ data }) => {
-    console.log("apointment", data)
+    console.log("appointment", data)
     const documentDate = data?.date ? formatDate(data.date) : formatDate(new Date());
     const footerColor = data.webSettingData?.footer_color || '#3caf40';
     // Format currency for salary display
@@ -80,7 +80,7 @@ export const AppointmentLetter = ({ data }) => {
                     </p>
 
                     <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
-                        Address- {data?.address}
+                        Address- {data?.candidateAddress}
                     </p>
                 </div>
 

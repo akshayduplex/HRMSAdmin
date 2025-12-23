@@ -55,7 +55,7 @@ export const ConsultantLetter = ({ data }) => {
                         Articles of Agreement made this day, the <strong>{formatDate(data?.joiningDate)}</strong> between
                         <strong> {data?.employeeName}</strong>, resident of S/O/D/O/W/O:
                         <strong> {data?.relativeName}</strong>, At-
-                        <strong> {data?.location}</strong>, hereinafter called the <strong>Party</strong>,
+                        <strong> {data?.candidateAddress}</strong>, hereinafter called the <strong>Party</strong>,
                         of the one part and the <strong>Hindustan Latex Family Planning Promotion Trust (HLFPPT)</strong>,
                         {data?.webSettingData?.office_address}, hereinafter called the <strong>Trust</strong>,
                         of the other part.
@@ -72,7 +72,7 @@ export const ConsultantLetter = ({ data }) => {
                     </p>
 
                     <ol style={{ paddingLeft: '20px' }}>
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '30px' }}>
                             The Party of the first part shall remain in the service of the Trust as
                             <strong> Consultant</strong> from <strong>{formatDateDMY(data?.joiningDate)}</strong> to
                             <strong> {formatDateDMY(data?.contractExpiryDate)}</strong> or till the completion of the project,
@@ -80,40 +80,40 @@ export const ConsultantLetter = ({ data }) => {
                             provisions herein contained.
                         </li>
 
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '30px' }}>
                             The Party has agreed to perform duties as per the job description set out in
                             <strong> Appendix – I</strong> here to, which shall constitute an integral part of
                             this Agreement.
                         </li>
 
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '30px' }}>
                             During the period of contract, while functioning as <strong>Consultant</strong>,
                             the Party will be entitled to the consultancy fee as set out in
                             <strong> Appendix – II</strong> here to, which shall constitute an integral part of
                             this Agreement.
                         </li>
 
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '30px' }}>
                             The appointment of the Party is purely on a contract basis and the Party shall not
                             be entitled to any claims, rights, interests or further benefits in terms of
                             regularization or consideration for further appointment to the said post or any
                             other post under the Trust.
                         </li>
 
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '30px' }}>
                             During the period of employment pursuant hereto, the Party shall devote his/her
                             whole time and attention to the work entrusted to him/her and shall not engage
                             directly or indirectly in any other business, work or services.
                         </li>
 
-                        <li style={{ marginBottom: '10px' }}>
+                        <li style={{ marginBottom: '30px' }}>
                             The services of the Party shall stand automatically terminated at the expiry of the
                             contract period, without any necessity of the Trust giving any notice or notice pay
                             and without any liability on the part of the Trust to pay any retrenchment or other
                             compensation whatsoever.
                         </li>
 
-                        <li style={{ marginBottom: '20px' }}>
+                        <li style={{ marginBottom: '0px' }}>
                             Notwithstanding anything contained herein above, the consultancy services of the
                             Party may be terminated at any time by the Trust without any notice or notice pay or
                             consultancy fee whatsoever, if the Party is found guilty of any insubordination,

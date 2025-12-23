@@ -140,7 +140,7 @@ export const FooterWithTextAndSignature = ({ webSettingData, showSignature = tru
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '40px', marginTop: '200px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '40px', marginTop: '65px' }}>
                 <div style={{ fontSize: '8pt', color: '#1d1e30' }}>
                     <p style={{ margin: '0 0 2px 0', fontWeight: 'bold' }}>
                         {webSettingData?.meta_title || 'Hindustan Latex Family Planning Promotion Trust'}
