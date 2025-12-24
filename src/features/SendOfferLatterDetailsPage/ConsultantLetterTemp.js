@@ -52,7 +52,7 @@ export const ConsultantLetter = ({ data }) => {
                     textAlign: 'justify'
                 }}>
                     <p style={{ marginBottom: '15px' }}>
-                        Articles of Agreement made this day, the <strong>{formatDate(data?.joiningDate)}</strong> between
+                        Articles of Agreement made this day, the <strong>{formatDateDMY(data?.joiningDate)}</strong> between
                         <strong> {data?.employeeName}</strong>, resident of S/O/D/O/W/O:
                         <strong> {data?.relativeName}</strong>, At-
                         <strong> {data?.candidateAddress}</strong>, hereinafter called the <strong>Party</strong>,

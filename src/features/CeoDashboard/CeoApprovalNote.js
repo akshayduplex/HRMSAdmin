@@ -65,6 +65,9 @@ function ApprovalTableCeo() {
     const [bulkApprovalStatus, setBulkApprovalStatus] = useState('Approved');
     const [bulkApprovalFeedback, setBulkApprovalFeedback] = useState('');
     const [bulkApprovalLoading, setBulkApprovalLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
     const navigate = useNavigate()
     const searchParams = DeBouncingForSearch(search)
     let loginUser = JSON.parse(localStorage.getItem('admin_role_user')) || {}
@@ -95,31 +98,42 @@ function ApprovalTableCeo() {
         }
     }, [pagination, searchParams])
 
-    const getApprovalNoteByTableView = React.useCallback(async (filterType = '') => {
-        try {
-            let payloads = {
-                "job_id": "",
-                "page_no": "1",
-                "per_page_record": 1000,
-                "scope_fields": [],
-                "keyword": searchParams,
-                "filter_type": filterType
-            }
-            let response = await axios.post(`${config.API_URL}getPendingCandidateApprovalNotesListForCeo`, payloads, apiHeaderToken(config.API_TOKEN))
+    const getApprovalNoteByTableView = React.useCallback(
+        async (filterType = '', pageNo = 1, perPage = 10) => {
+            setLoader(true);
+            try {
+                const payload = {
+                    job_id: "",
+                    page_no: pageNo,
+                    per_page_record: perPage,
+                    scope_fields: [],
+                    keyword: searchParams,
+                    filter_type: filterType
+                };
 
-            if (response.status === 200) {
-                setTableData(response.data?.data)
-            } else {
-                console.log(response.data)
-            }
+                const response = await axios.post(
+                    `${config.API_URL}getPendingCandidateApprovalNotesListForCeo`,
+                    payload,
+                    apiHeaderToken(config.API_TOKEN)
+                );
 
-        } catch (error) {
-            console.log(error)
-        }
-        finally {
-            setLoader(false)
-        }
-    }, [searchParams])
+                if (response.status === 200) {
+                    setTableData(response.data.data || []);
+                    setTotalRows(response.data.total || 0);
+                } else {
+                    setTableData([]);
+                    setTotalRows(0);
+                }
+            } catch (error) {
+                console.error(error);
+                setTableData([]);
+                setTotalRows(0);
+            } finally {
+                setLoader(false);
+            }
+        },
+        [searchParams]
+    );
 
     const hasMore = () => {
         let increasePageSize = pagination + 9
@@ -128,11 +142,9 @@ function ApprovalTableCeo() {
 
     useEffect(() => {
         if (getParams.get('type') === 'PendingByCeo') {
-
-            getApprovalNoteByTableView(getParams.get('type'))
-
+            getApprovalNoteByTableView(getParams.get('type'), page, pageSize);
         }
-    }, [getParams.get('type')])
+    }, [getParams.get('type'), page, pageSize, searchParams, getApprovalNoteByTableView]);
 
     const rows = useMemo(() => {
         if (!tableData) return [];
@@ -1022,58 +1034,64 @@ function ApprovalTableCeo() {
                     }
 
                     {
-                        getParams.get('type') === 'PendingByCeo' && loader ? <div className="d-flex align-content-center justify-content-center">
-                            <InfinitySpin
-                                visible={true}
-                                width="200"
-                                color="#4fa94d"
-                                ariaLabel="infinity-spin-loading"
-                            /> </div> :
-
-                            getParams.get('type') === 'PendingByCeo' && tableData && tableData?.length > 0 ?
-                                <Box sx={{ width: '100%', marginTop: 2 }}>
-                                    <DataGrid
-                                        rows={rows || []}
-                                        columns={columns}
-                                        checkboxSelection
-                                        disableRowSelectionOnClick={false}
-                                        pageSize={10}
-                                        initialState={{
-                                            pagination: {
-                                                paginationModel: { page: 0, pageSize: 10 },
-                                            },
-                                        }}
-                                        pageSizeOptions={[5, 10, 20, 40, 50]}
-                                        rowHeight={80}
-                                        onRowSelectionModelChange={(newSelection) => {
-                                            // Convert selected IDs to full row data objects
-                                            const selectedRowData = rows.filter(row =>
-                                                newSelection.includes(row.id)
-                                            );
-                                            setSelectedRows(selectedRowData);
-                                        }}
-                                        disableColumnFilter
-                                        disableColumnSelector
-                                        disableDensitySelector
-                                        sx={{
-                                            '& .MuiDataGrid-cell:focus': {
-                                                outline: 'none',
-                                            },
-                                            '& .MuiDataGrid-row:hover': {
-                                                backgroundColor: '#f5f5f5',
-                                            },
-                                        }}
-                                    />
-                                </Box>
-                                :
-                                getParams.get('type') === 'PendingByCeo' && (
-                                    <Box sx={{ width: '100%', marginTop: 2, textAlign: 'center', padding: 4 }}>
-                                        <Paper sx={{ padding: 3 }}>
-                                            <strong>Records Not Found</strong>
-                                        </Paper>
-                                    </Box>
-                                )
-                    }
+                        getParams.get('type') === 'PendingByCeo' && loader ? (
+                            <div className="d-flex align-content-center justify-content-center">
+                                <InfinitySpin visible={true} width="200" color="#4fa94d" ariaLabel="infinity-spin-loading" />
+                            </div>
+                        ) : getParams.get('type') === 'PendingByCeo' && tableData && tableData.length > 0 ? (
+                            <Box sx={{ width: '100%', marginTop: 2 }}>
+                                <DataGrid
+                                    rows={rows || []}
+                                    columns={columns}
+                                    pagination
+                                    paginationMode="server"
+                                    rowCount={totalRows}
+                                    paginationModel={{
+                                        page: page - 1,
+                                        pageSize
+                                    }}
+                                    onPaginationModelChange={(model) => {
+                                        setPage(model.page + 1);
+                                        setPageSize(model.pageSize);
+                                    }}
+                                    loading={loader}
+                                    pageSizeOptions={[5, 10, 20, 50, 100]}
+                                    checkboxSelection
+                                    disableRowSelectionOnClick={false}
+                                    pageSize={10}
+                                    initialState={{
+                                        pagination: {
+                                            paginationModel: { page: 0, pageSize: 10 },
+                                        },
+                                    }}
+                                    rowHeight={80}
+                                    onRowSelectionModelChange={(newSelection) => {
+                                        // Convert selected IDs to full row data objects
+                                        const selectedRowData = rows.filter(row =>
+                                            newSelection.includes(row.id)
+                                        );
+                                        setSelectedRows(selectedRowData);
+                                    }}
+                                    disableColumnFilter
+                                    disableColumnSelector
+                                    disableDensitySelector
+                                    sx={{
+                                        '& .MuiDataGrid-cell:focus': {
+                                            outline: 'none',
+                                        },
+                                        '& .MuiDataGrid-row:hover': {
+                                            backgroundColor: '#f5f5f5',
+                                        },
+                                    }}
+                                />
+                            </Box>
+                        ) : getParams.get('type') === 'PendingByCeo' && (
+                            <Box sx={{ width: '100%', marginTop: 2, textAlign: 'center', padding: 4 }}>
+                                <Paper sx={{ padding: 3 }}>
+                                    <strong>Records Not Found</strong>
+                                </Paper>
+                            </Box>
+                        )}
                 </div>
             </div>
 
