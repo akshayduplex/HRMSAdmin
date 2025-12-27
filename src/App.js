@@ -299,7 +299,7 @@ const App = () => {
               )
             }
           />
-          <Route path="/template-preview/:candidateId/:approvalId" element={<TemplatePreviewPage />} />
+          <Route exact path="/template-preview/:candidateId/:approvalId" element={<TemplatePreviewPage />} />
           <Route exact path="/candidate-listing" element={<RequireAuth><CandidateListing /></RequireAuth>} />
           <Route exact path="/candidate-joining-listing" element={<RequireAuth><JoiningCandidateList /></RequireAuth>} />
           <Route exact path="/approval-candidate-list/:id" element={<RequireAuth><SendOfferLatterForApprovalCandidate /></RequireAuth>} />

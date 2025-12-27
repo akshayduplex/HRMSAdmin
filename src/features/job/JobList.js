@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 
@@ -88,6 +89,10 @@ function JobList() {
     const [toDate, setToDate] = useState('');
 
     const searchParams = DeBouncingForSearch(search)
+    const [searchParamsUrl] = useSearchParams();
+
+    const queryProjectId = searchParamsUrl.get("project_id");
+    const queryProjectName = searchParamsUrl.get("project_name");
 
     // Helper function to format date for input
     const formatDateForInput = (date) => {
@@ -103,6 +108,55 @@ function JobList() {
     //     setToDate(formatDateForInput(today));
     //     setFromDate(formatDateForInput(oneMonthAgo));
     // }, []);
+    useEffect(() => {
+        if (queryProjectId && queryProjectName) {
+            const selectedProject = {
+                value: queryProjectId,
+                label: decodeURIComponent(queryProjectName),
+            };
+
+            setProjectOptions(selectedProject);
+            localStorage.setItem("allJobList", JSON.stringify(selectedProject));
+
+            // 🔹 Fetch jobs with project_id
+            const basePayload = {
+                keyword: "",
+                department: "",
+                job_title: "",
+                location: "",
+                job_type: "",
+                salary_range: "",
+                page_no: "1",
+                per_page_record: "100",
+                project_id: queryProjectId,
+                scope_fields: [
+                    "_id",
+                    "project_name",
+                    "department",
+                    "job_title",
+                    "job_type",
+                    "experience",
+                    "location",
+                    "salary_range",
+                    "status",
+                    "working",
+                    "deadline",
+                    "form_candidates",
+                    "total_vacancy",
+                    "available_vacancy",
+                    "add_date",
+                    "designation",
+                    "naukari_job_data",
+                    "requisition_form_opening_type",
+                    "job_title_slug",
+                ],
+            };
+
+            dispatch(GetJobList({ ...basePayload, status: "Published" }));
+            dispatch(ExpiredJobList({ ...basePayload, status: "Expired" }));
+            dispatch(AchievedJobList({ ...basePayload, status: "Archived" }));
+        }
+    }, [queryProjectId, queryProjectName, dispatch]);
 
     const handleResetOption = (e) => {
         e.preventDefault()

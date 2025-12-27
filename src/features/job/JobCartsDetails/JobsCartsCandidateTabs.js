@@ -93,6 +93,7 @@ export default function JobCardsCandidateTabs() {
     const [QueryParams] = useSearchParams();
     const [batchId, setBatchId] = useState(null);
     const type = QueryParams.get('type');
+    const projectNameFromUrl = QueryParams.get('project_name');
     const [activeTab, setActiveTab] = useState(type === 'new' ? 'first' : type === 'upcomming' ? 'third' : type === 'Shortlisted' ? 'second' : type === 'Interview' ? "third" : type === 'Rejected' ? 'six' : type === 'Hired' ? 'five' : type === 'Offered' ? 'four' : type === 'approval-total' || type === 'approval-pending' ? "approval" : 'zero');
     const AppliedCandidateServer = useSelector((state) => state.appliedJobList.AppliedCandidateServer)
     const AppliedCandidateListCount = useSelector((state) => state.appliedJobList.AppliedCandidateListCount)
@@ -100,7 +101,7 @@ export default function JobCardsCandidateTabs() {
     const resetTheValue = useSelector((state) => state.appliedJobList.resetTheValue);
     const getEmployeeRecords = JSON.parse(localStorage.getItem('admin_role_user') ?? {})
     const [CandidatesDetials, setCandidatesDetials] = useState([]);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(projectNameFromUrl || "");
     const dispatch = useDispatch();
     const [BatchId, setNewBatchId] = useState('')
     const [isActive, setIsActive] = useState(true);
@@ -108,7 +109,7 @@ export default function JobCardsCandidateTabs() {
     const [memberData, setMember] = useState(null);
     const [openMemberList, setOpenMemberList] = useState(false);
     const [approvalNotes, setListApproval] = useState(null);
-    const [searchApprovalNode, setSearchApprovalNode] = useState('');
+    const [searchApprovalNode, setSearchApprovalNode] = useState(projectNameFromUrl || "");
     const [downloading, setDownloading] = useState(false);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [paginationModelApproval, setPaginationApprovalModel] = useState({ page: 0, pageSize: 10 });
@@ -119,6 +120,14 @@ export default function JobCardsCandidateTabs() {
     const [showModal, setShowModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterData, setFilterData] = useState(null);
+    useEffect(() => {
+        if (projectNameFromUrl) {
+            setSearch(projectNameFromUrl);
+            setSearchApprovalNode(projectNameFromUrl);
+            // Reset pagination when project name is set
+            setPaginationModel({ page: 0, pageSize: paginationModel.pageSize });
+        }
+    }, [projectNameFromUrl]);
 
     const handlePaginationModelChange = useCallback((newPaginationModel) => {
         setPaginationModel(newPaginationModel);
@@ -179,10 +188,16 @@ export default function JobCardsCandidateTabs() {
 
     const handleResetFilter = () => {
         setFilterData(null);
+        if (!projectNameFromUrl) {
+            setSearch('');
+        }
     };
 
     const handleClearFilter = () => {
         setFilterData(null);
+        if (!projectNameFromUrl) {
+            setSearch('');
+        }
     };
 
     const handleCreateOption = (inputValue) => {
@@ -492,7 +507,7 @@ export default function JobCardsCandidateTabs() {
             getApprovalListByJobId(jobFilter?.value || '')
             // dispatch(FetchAppliedCandidateDetailsCount());
         }
-    }, [filterJobDetails, getApprovalListByJobId, id , status]);
+    }, [filterJobDetails, getApprovalListByJobId, id, status]);
 
     useEffect(() => {
 

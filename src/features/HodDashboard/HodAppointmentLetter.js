@@ -47,9 +47,12 @@ function StatusChip({ value }) {
 
 
 export default function AppointmentApprovalHod() {
+    const [searchParams] = useSearchParams();
+    const type = searchParams.get('type')
+    const projectName = searchParams.get('project_name');
     const [rows, setRows] = React.useState([]);
     const [activeRow, setActiveRow] = React.useState(null);
-    const [search, setSearch] = React.useState('');
+    const [search, setSearch] = React.useState(projectName || '');
     const [remarkModalOpen, setRemarkModalOpen] = React.useState(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = React.useState(false);
     const [currentRowId, setCurrentRowId] = React.useState(null);
@@ -59,9 +62,12 @@ export default function AppointmentApprovalHod() {
     const theme = useTheme();
     const [approvalData, setApprovalData] = React.useState(null);
     let user = JSON.parse(localStorage.getItem('admin_role_user')) || {};
-    const [searchParams] = useSearchParams();
-    const type = searchParams.get('type')
 
+    useEffect(() => {
+        if (projectName) {
+            setSearch(projectName);
+        }
+    }, [projectName]);
 
     const getPendingCandidatesList = async () => {
         try {
@@ -183,35 +189,36 @@ export default function AppointmentApprovalHod() {
     };
 
     const getTemplateList = async (data) => {
-
-        // console.log( data , 'this is data' );
-
         try {
-
             let payload = {
-                "approval_note_id": data?._id,
-                "candidate_id": data?.cand_doc_id,
-                "doc_category": 'Appointment Letter'
-            }
+                approval_note_id: data?._id,
+                candidate_id: data?.cand_doc_id,
+                doc_category: 'Appointment Letter'
+            };
 
-            let response = await axios.post(`${config.API_URL}getCandidateEmailContent`, payload, apiHeaderToken(config.API_TOKEN))
+            const response = await axios.post(
+                `${config.API_URL}getCandidateEmailContent`,
+                payload,
+                apiHeaderToken(config.API_TOKEN)
+            );
 
             if (response.status === 200) {
-                const templateHtml = response.data?.data?.content_data || '';
                 localStorage.setItem("offer_letter_preview", true);
                 localStorage.setItem("offer_letter_preview_data", JSON.stringify(response.data?.data));
                 localStorage.setItem("template_description", JSON.stringify(response.data?.data?.content_data));
-                // Open the preview page in a new tab
-                window.open('/preview-letter', '_blank');
+                const jobType = data?.job_type;
+
+                window.open(
+                    `/template-preview/${data?.cand_doc_id}/${data?._id}?type=appointment&job_type=${jobType}`,
+                    '_blank'
+                );
             } else {
-                // setTemplateData(null)
-                toast.error("Records not Found")
+                toast.error("Records not Found");
             }
         } catch (error) {
-            // setTemplateData(null)
             toast.error("Records not Found");
         }
-    }
+    };
 
     const filtered = React.useMemo(() => {
         if (!approvalData || !Array.isArray(approvalData)) return [];

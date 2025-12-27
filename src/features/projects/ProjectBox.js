@@ -189,7 +189,8 @@ const ProjectBox = (props) => {
             <BudgetModal show={modalShow} id={itemData._id} onHide={() => setModalShow(false)} />
             <ExtendDurationModal show={modalShowOne} id={itemData._id} onHide={() => setModalShowOne(false)} />
             <SendMprProject open={openSendMpr} setOpenClosed={setOpenSetMpr} Data={openSendMprData} loadingFetch={loading} />
-            <ViewDetailsModal show={modalShowView} id={itemData._id} onHide={() => setModalShowView(false)} />
+            <ViewDetailsModal show={modalShowView} projectId={itemData._id} onHide={() => setModalShowView(false)} />
+
         </>
     );
 };
